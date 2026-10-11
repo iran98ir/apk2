@@ -16,11 +16,14 @@ import androidx.appcompat.app.AppCompatActivity
 
 /**
  * WebView اصلی.
- * - url از json
- * - keepSession -> cookies فعال/غیرفعال
- * - extLink -> لینک‌های خارجی توی مرورگر باز شن
- * - deepLink -> اسکیم‌های غیر http به اکشن مناسب
- * - خطاها -> ErrorActivity با نوع مناسب
+ *
+ * قانون:
+ *  - url از web.url
+ *  - keepSession از web.keepSession → کوکی‌ها
+ *  - extLink از web.extLink → لینک‌های خارجی توی مرورگر
+ *  - deepLink از web.deepLink → اسکیم‌های غیر http
+ *  - browserOnly از web.browserOnly → لیست دامنه‌هایی که همیشه توی مرورگر باز شن
+ *  - خطاها بر اساس کد WebView → یکی از کلیدهای error.items
  */
 class WebActivity : AppCompatActivity() {
 
@@ -35,12 +38,14 @@ class WebActivity : AppCompatActivity() {
         val web = config.web
 
         val root = FrameLayout(this)
-        webView = WebView(this)
-        webView.layoutParams = FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.MATCH_PARENT,
-            FrameLayout.LayoutParams.MATCH_PARENT
-        )
+        webView = WebView(this).apply {
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            )
+        }
 
+        // --- تنظیمات WebView ---
         val settings = webView.settings
         settings.javaScriptEnabled = true
         settings.domStorageEnabled = true
@@ -53,6 +58,7 @@ class WebActivity : AppCompatActivity() {
         settings.cacheMode = WebSettings.LOAD_DEFAULT
         settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
 
+        // --- کوکی‌ها بر اساس keepSession ---
         if (web.keepSession) {
             CookieManager.getInstance().setAcceptCookie(true)
             CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true)
@@ -62,6 +68,7 @@ class WebActivity : AppCompatActivity() {
             CookieManager.getInstance().removeAllCookies(null)
         }
 
+        // --- WebViewClient ---
         webView.webViewClient = object : WebViewClient() {
 
             override fun shouldOverrideUrlLoading(
@@ -70,12 +77,11 @@ class WebActivity : AppCompatActivity() {
             ): Boolean {
                 val url = request.url.toString()
 
-                // deepLink (اسکیم‌های غیر http/https)
+                // deepLink — اسکیم غیر http(s)
                 if (!url.startsWith("http://") && !url.startsWith("https://")) {
                     if (web.deepLink) {
                         return try {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                            startActivity(intent)
+                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
                             true
                         } catch (e: Exception) {
                             true
@@ -84,7 +90,17 @@ class WebActivity : AppCompatActivity() {
                     return true
                 }
 
-                // extLink -> باز کردن لینک خارجی توی مرورگر
+                // browserOnly — لیست دامنه‌ها که همیشه توی مرورگر باز شن
+                if (matchesBrowserOnly(url, web.browserOnly)) {
+                    return try {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                        true
+                    } catch (e: Exception) {
+                        false
+                    }
+                }
+
+                // extLink — دامنه خارجی
                 if (web.extLink && !isSameDomain(url, web.url)) {
                     return try {
                         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
@@ -107,10 +123,8 @@ class WebActivity : AppCompatActivity() {
                 error: WebResourceError
             ) {
                 super.onReceivedError(view, request, error)
-                // فقط خطای main frame مهمه
                 if (request.isForMainFrame) {
-                    val errorType = mapErrorCode(error.errorCode)
-                    gotoError(errorType)
+                    gotoError(mapErrorCode(error.errorCode))
                 }
             }
         }
@@ -123,6 +137,26 @@ class WebActivity : AppCompatActivity() {
         webView.loadUrl(web.url)
     }
 
+    /**
+     * آیا url توی لیست browserOnly هست؟
+     * لیست با کاما جدا شده، مثل: "zarinpal.com, telegram.org"
+     */
+    private fun matchesBrowserOnly(url: String, browserOnly: String): Boolean {
+        if (browserOnly.isBlank()) return false
+        val host = try {
+            Uri.parse(url).host ?: return false
+        } catch (e: Exception) {
+            return false
+        }
+        return browserOnly.split(",")
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+            .any { host == it || host.endsWith(".$it") }
+    }
+
+    /**
+     * آیا دو url هم‌دامنه هستن؟
+     */
     private fun isSameDomain(a: String, b: String): Boolean {
         return try {
             val ha = Uri.parse(a).host ?: return false
@@ -133,44 +167,40 @@ class WebActivity : AppCompatActivity() {
         }
     }
 
-    private fun mapErrorCode(code: Int): String {
-        // نگاشت کدهای WebView به کلیدهای json: offline, timeout, dns, ssl, e404, e500, down, unknown
-        return when (code) {
-            WebViewClient.ERROR_HOST_LOOKUP -> "dns"
-            WebViewClient.ERROR_CONNECT -> "offline"
-            WebViewClient.ERROR_TIMEOUT -> "timeout"
-            WebViewClient.ERROR_FAILED_SSL_HANDSHAKE -> "ssl"
-            WebViewClient.ERROR_BAD_URL -> "unknown"
-            WebViewClient.ERROR_UNSUPPORTED_SCHEME -> "unknown"
-            WebViewClient.ERROR_TOO_MANY_REQUESTS -> "e500"
-            WebViewClient.ERROR_FILE_NOT_FOUND -> "e404"
-            else -> "unknown"
-        }
+    /**
+     * کد خطای WebView → کلید error.items
+     * اگه چیزی پیدا نشد → unknown
+     */
+    private fun mapErrorCode(code: Int): String = when (code) {
+        WebViewClient.ERROR_HOST_LOOKUP          -> "dns"
+        WebViewClient.ERROR_CONNECT               -> "offline"
+        WebViewClient.ERROR_TIMEOUT               -> "timeout"
+        WebViewClient.ERROR_FAILED_SSL_HANDSHAKE  -> "ssl"
+        WebViewClient.ERROR_BAD_URL               -> "unknown"
+        WebViewClient.ERROR_UNSUPPORTED_SCHEME    -> "unknown"
+        WebViewClient.ERROR_TOO_MANY_REQUESTS     -> "e500"
+        WebViewClient.ERROR_FILE_NOT_FOUND        -> "e404"
+        else                                      -> "unknown"
     }
 
     private fun gotoError(type: String) {
         val i = Intent(this, ErrorActivity::class.java)
-        i.putExtra("error_type", type)
+        i.putExtra(EXTRA_ERROR_TYPE, type)
         startActivity(i)
         finish()
     }
 
     override fun onBackPressed() {
-        // اگه exit فعاله، دیالوگ نشون بده
         if (config.exit.active) {
-            showExitDialog()
+            ExitDialog.show(this, config) {
+                if (webView.canGoBack()) webView.goBack() else finish()
+            }
             return
         }
-        if (webView.canGoBack()) {
-            webView.goBack()
-        } else {
-            super.onBackPressed()
-        }
+        if (webView.canGoBack()) webView.goBack() else super.onBackPressed()
     }
 
-    private fun showExitDialog() {
-        ExitDialog.show(this, config) {
-            if (webView.canGoBack()) webView.goBack() else finish()
-        }
+    companion object {
+        const val EXTRA_ERROR_TYPE = "error_type"
     }
 }
