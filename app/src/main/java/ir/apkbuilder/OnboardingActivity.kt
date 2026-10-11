@@ -4,17 +4,15 @@ import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
 import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.viewpager2.widget.ViewPager2
-import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import android.view.LayoutInflater
-import android.view.View
-import android.graphics.drawable.GradientDrawable
+import androidx.viewpager2.widget.ViewPager2
 
 /**
  * Onboarding: صفحات از json.
@@ -31,11 +29,9 @@ class OnboardingActivity : AppCompatActivity() {
 
         val onb = config.onb
 
-        // ریشه
         val root = FrameLayout(this)
         root.background = SvgHelper.makeBackground(onb.bgMode, onb.bg, onb.bg2, onb.bgAngle)
 
-        // ستون اصلی
         val col = LinearLayout(this)
         col.orientation = LinearLayout.VERTICAL
         col.layoutParams = FrameLayout.LayoutParams(
@@ -44,7 +40,6 @@ class OnboardingActivity : AppCompatActivity() {
         )
         root.addView(col)
 
-        // ViewPager2
         val pager = ViewPager2(this)
         val pagerLp = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f
@@ -53,7 +48,6 @@ class OnboardingActivity : AppCompatActivity() {
         pager.adapter = OnbAdapter(onb.pages, onb.txt)
         col.addView(pager)
 
-        // دکمه پایین
         val btn = Button(this)
         val btnLp = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
@@ -66,9 +60,10 @@ class OnboardingActivity : AppCompatActivity() {
             SvgHelper.dp(this, 24)
         )
         btn.layoutParams = btnLp
-        btn.text = "ادامه" // متن از json نمیاد چون توی نمونه json ندیدیم
+        btn.text = "ادامه"
         btn.setTextColor(SvgHelper.parseColor(onb.txt))
         btn.typeface = loadFont()
+        btn.isAllCaps = false
         col.addView(btn)
 
         btn.setOnClickListener {
@@ -105,13 +100,16 @@ class OnboardingActivity : AppCompatActivity() {
         }
     }
 
-    // Adapter
     inner class OnbAdapter(
         private val pages: List<OnbPage>,
         private val txtColor: String
     ) : RecyclerView.Adapter<OnbAdapter.VH>() {
 
-        inner class VH(v: View) : RecyclerView.ViewHolder(v)
+        inner class VH(v: View) : RecyclerView.ViewHolder(v) {
+            val iconHolder: FrameLayout = v.findViewWithTag("iconHolder")
+            val tvTitle: TextView = v.findViewWithTag("tvTitle")
+            val tvDesc: TextView = v.findViewWithTag("tvDesc")
+        }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
             val ctx = parent.context
@@ -130,40 +128,36 @@ class OnboardingActivity : AppCompatActivity() {
                 SvgHelper.dp(ctx, 24)
             )
 
-            // آیکون
             val iconHolder = FrameLayout(ctx)
+            iconHolder.tag = "iconHolder"
             iconHolder.layoutParams = LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
             wrap.addView(iconHolder)
 
-            // عنوان
             val tvTitle = TextView(ctx)
+            tvTitle.tag = "tvTitle"
             tvTitle.gravity = Gravity.CENTER
             tvTitle.setPadding(0, SvgHelper.dp(ctx, 16), 0, SvgHelper.dp(ctx, 8))
             wrap.addView(tvTitle)
 
-            // توضیح
             val tvDesc = TextView(ctx)
+            tvDesc.tag = "tvDesc"
             tvDesc.gravity = Gravity.CENTER
             wrap.addView(tvDesc)
 
-            wrap.tag = Triple(iconHolder, tvTitle, tvDesc)
             return VH(wrap)
         }
 
         override fun onBindViewHolder(holder: VH, position: Int) {
             val page = pages[position]
-            val wrap = holder.itemView as LinearLayout
-            @Suppress("UNCHECKED_CAST")
-            val (iconHolder, tvTitle, tvDesc) = wrap.tag as Triple<FrameLayout, TextView, TextView>
 
-            iconHolder.removeAllViews()
+            holder.iconHolder.removeAllViews()
             if (!page.iconSvg.isNullOrBlank()) {
                 SvgHelper.buildIconView(
-                    wrap.context,
-                    iconHolder,
+                    holder.itemView.context,
+                    holder.iconHolder,
                     page.iconSvg,
                     page.iconSize,
                     page.iconBoxSize,
@@ -175,15 +169,15 @@ class OnboardingActivity : AppCompatActivity() {
                 )
             }
 
-            tvTitle.text = page.t
-            tvTitle.textSize = page.tSize.toFloat()
-            tvTitle.setTextColor(SvgHelper.parseColor(txtColor))
-            tvTitle.typeface = loadFont()
+            holder.tvTitle.text = page.t
+            holder.tvTitle.textSize = page.tSize.toFloat()
+            holder.tvTitle.setTextColor(SvgHelper.parseColor(txtColor))
+            holder.tvTitle.typeface = loadFont()
 
-            tvDesc.text = page.d
-            tvDesc.textSize = page.dSize.toFloat()
-            tvDesc.setTextColor(SvgHelper.parseColor(txtColor))
-            tvDesc.typeface = loadFont()
+            holder.tvDesc.text = page.d
+            holder.tvDesc.textSize = page.dSize.toFloat()
+            holder.tvDesc.setTextColor(SvgHelper.parseColor(txtColor))
+            holder.tvDesc.typeface = loadFont()
         }
 
         override fun getItemCount(): Int = pages.size
