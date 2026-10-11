@@ -52,12 +52,10 @@ class OnboardingActivity : AppCompatActivity() {
         }
         root.addView(col)
 
-        // تعداد نمایشی
         val count = onb.count.toIntOrNull() ?: onb.pages.size
         val visiblePages = onb.pages.take(count)
         totalPages = visiblePages.size
 
-        // ViewPager2 — سوایپ
         val pager = ViewPager2(this).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f
@@ -67,7 +65,6 @@ class OnboardingActivity : AppCompatActivity() {
         }
         col.addView(pager)
 
-        // Dots پایین
         dotsContainer = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
@@ -83,7 +80,6 @@ class OnboardingActivity : AppCompatActivity() {
 
         buildDots(onb.txt, 0)
 
-        // listener برای تغییر صفحه
         pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 buildDots(onb.txt, position)
@@ -96,26 +92,22 @@ class OnboardingActivity : AppCompatActivity() {
 
     /**
      * ساخت Dots نئونی.
-     *  - صفحه فعلی: مستطیل با دو سر گرد (پهن‌تر)
-     *  - بقیه: دایره پر
-     *  - رنگ: onb.txt با افکت درخشان (نئون/شیشه‌ای)
      */
     private fun buildDots(txtColor: String, current: Int) {
         dotsContainer.removeAllViews()
 
         val baseColor = SvgHelper.parseColor(txtColor)
-        val glowColor = withAlpha(baseColor, 0.45f)   // هاله نئونی
-        val dotColor  = withAlpha(baseColor, 0.95f)   // رنگ خود نقطه
+        val glowColor = withAlpha(baseColor, 0.45f)
+        val dotColor  = withAlpha(baseColor, 0.95f)
 
-        val dotSize   = SvgHelper.dp(this, 8)
-        val activeW   = SvgHelper.dp(this, 26)
-        val activeH   = SvgHelper.dp(this, 8)
-        val gap       = SvgHelper.dp(this, 8)
+        val dotSize = SvgHelper.dp(this, 8)
+        val activeW = SvgHelper.dp(this, 26)
+        val activeH = SvgHelper.dp(this, 8)
+        val gap     = SvgHelper.dp(this, 8)
 
         for (i in 0 until totalPages) {
             val isActive = i == current
 
-            // کانتینر هر نقطه — برای داشتن افکت glow با padding
             val wrap = FrameLayout(this).apply {
                 layoutParams = LinearLayout.LayoutParams(
                     if (isActive) activeW else dotSize,
@@ -125,36 +117,15 @@ class OnboardingActivity : AppCompatActivity() {
                 }
             }
 
-            // خود نقطه
-            val shape = GradientDrawable().apply {
-                shape = GradientDrawable.RECTANGLE
-                cornerRadius = if (isActive) activeH / 2f else dotSize / 2f
-                setColor(dotColor)
-            }
-
-            val dot = View(this).apply {
-                layoutParams = FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.MATCH_PARENT,
-                    FrameLayout.LayoutParams.MATCH_PARENT
-                )
-                background = shape
-                elevation = SvgHelper.dp(this@OnboardingActivity, 6).toFloat()
-                // سایه نئونی هم‌رنگ متن
-                outlineSpotShadowColor = glowColor
-                outlineAmbientShadowColor = glowColor
-            }
-
-            wrap.addView(dot)
-
-            // هاله نئونی (لایه زیرین — کمی پهن‌تر و شفاف)
+            // هاله نئونی (لایه زیر)
             val glow = View(this).apply {
                 layoutParams = FrameLayout.LayoutParams(
                     FrameLayout.LayoutParams.MATCH_PARENT,
                     FrameLayout.LayoutParams.MATCH_PARENT
                 ).apply {
-                    leftMargin = -SvgHelper.dp(this@OnboardingActivity, 3)
-                    rightMargin = -SvgHelper.dp(this@OnboardingActivity, 3)
-                    topMargin = -SvgHelper.dp(this@OnboardingActivity, 3)
+                    leftMargin   = -SvgHelper.dp(this@OnboardingActivity, 3)
+                    rightMargin  = -SvgHelper.dp(this@OnboardingActivity, 3)
+                    topMargin    = -SvgHelper.dp(this@OnboardingActivity, 3)
                     bottomMargin = -SvgHelper.dp(this@OnboardingActivity, 3)
                 }
                 background = GradientDrawable().apply {
@@ -165,25 +136,34 @@ class OnboardingActivity : AppCompatActivity() {
                 }
                 alpha = if (isActive) 0.85f else 0.4f
             }
+            wrap.addView(glow)
 
-            // ترتیب: اول glow، بعد dot
-            wrap.addView(glow, 0)
+            // نقطه اصلی
+            val dot = View(this).apply {
+                layoutParams = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT
+                )
+                background = GradientDrawable().apply {
+                    shape = GradientDrawable.RECTANGLE
+                    cornerRadius = if (isActive) activeH / 2f else dotSize / 2f
+                    setColor(dotColor)
+                }
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                    outlineAmbientShadowColor = glowColor
+                    outlineSpotShadowColor = glowColor
+                }
+                elevation = SvgHelper.dp(this@OnboardingActivity, 6).toFloat()
+            }
+            wrap.addView(dot)
 
             dotsContainer.addView(wrap)
         }
     }
 
-    /**
-     * افزودن آلفا به رنگ.
-     */
     private fun withAlpha(color: Int, alpha: Float): Int {
         val a = (alpha.coerceIn(0f, 1f) * 255).toInt()
-        return Color.argb(
-            a,
-            Color.red(color),
-            Color.green(color),
-            Color.blue(color)
-        )
+        return Color.argb(a, Color.red(color), Color.green(color), Color.blue(color))
     }
 
     private fun loadFont(): Typeface? = try {
@@ -242,7 +222,6 @@ class OnboardingActivity : AppCompatActivity() {
             holder.boxCenter.removeAllViews()
             holder.boxBottom.removeAllViews()
 
-            // --- آیکون ---
             if (page.iconPos != "hidden" && page.iconSvg.isNotBlank()) {
                 val holderBox = FrameLayout(ctx)
                 SvgHelper.buildIconView(
@@ -254,7 +233,6 @@ class OnboardingActivity : AppCompatActivity() {
                 pickBox(holder, page.iconPos).addView(holderBox)
             }
 
-            // --- متن ---
             if (page.textPos != "hidden") {
                 val textBox = LinearLayout(ctx).apply {
                     orientation = LinearLayout.VERTICAL
