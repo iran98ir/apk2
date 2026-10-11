@@ -1,7 +1,7 @@
 {
     "brand": {
         "mode": "new",
-        "name": "حمیدو",
+        "name": "mumu",
         "pkg": "ir.hamham",
         "ver": "مقدار 1_A 111",
         "vcode": 111
@@ -267,4 +267,4 @@
         "btnShape": "rounded",
         "btnStyle": "elevated"
     }
-            }
+}
