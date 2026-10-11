@@ -11,13 +11,19 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 
 /**
- * Onboarding: صفحات از json.
- * هر صفحه: آیکون SVG + عنوان + توضیح.
- * دکمه پایین برای رفتن به صفحه بعد / ورود.
+ * صفحه آنبوردینگ.
+ *
+ * قانون:
+ *  - تعداد صفحات نمایشی از onb.count ("2" یا "3")
+ *  - صفحات از onb.pages (آرایه json)
+ *  - پس‌زمینه از onb.bg/bgMode/bg2/bgAngle
+ *  - رنگ متن از onb.txt
+ *  - هر صفحه: آیکون + عنوان + زیرمتن با موقعیت از json
  */
 class OnboardingActivity : AppCompatActivity() {
 
@@ -32,56 +38,63 @@ class OnboardingActivity : AppCompatActivity() {
         val root = FrameLayout(this)
         root.background = SvgHelper.makeBackground(onb.bgMode, onb.bg, onb.bg2, onb.bgAngle)
 
-        val col = LinearLayout(this)
-        col.orientation = LinearLayout.VERTICAL
-        col.layoutParams = FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.MATCH_PARENT,
-            FrameLayout.LayoutParams.MATCH_PARENT
-        )
+        val col = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            )
+        }
         root.addView(col)
 
-        val pager = ViewPager2(this)
-        val pagerLp = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f
-        )
-        pager.layoutParams = pagerLp
-        pager.adapter = OnbAdapter(onb.pages, onb.txt)
+        // تعداد نمایشی
+        val total = onb.count.toIntOrNull() ?: onb.pages.size
+        val visiblePages = onb.pages.take(total)
+
+        val pager = ViewPager2(this).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f
+            )
+            adapter = OnbAdapter(visiblePages, onb.txt)
+        }
         col.addView(pager)
 
-        val btn = Button(this)
-        val btnLp = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        btnLp.setMargins(
-            SvgHelper.dp(this, 24),
-            SvgHelper.dp(this, 8),
-            SvgHelper.dp(this, 24),
-            SvgHelper.dp(this, 24)
-        )
-        btn.layoutParams = btnLp
-        btn.text = "ادامه"
-        btn.setTextColor(SvgHelper.parseColor(onb.txt))
-        btn.typeface = loadFont()
-        btn.isAllCaps = false
-        col.addView(btn)
-
-        btn.setOnClickListener {
-            val current = pager.currentItem
-            if (current < onb.pages.size - 1) {
-                pager.currentItem = current + 1
-            } else {
-                finishOnboarding()
+        // دکمه پایین (متن ثابت — توی json نیست)
+        val btn = Button(this).apply {
+            text = BTN_TEXT
+            setTextColor(SvgHelper.parseColor(onb.txt))
+            typeface = loadFont()
+            isAllCaps = false
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(
+                    SvgHelper.dp(this@OnboardingActivity, 24),
+                    SvgHelper.dp(this@OnboardingActivity, 8),
+                    SvgHelper.dp(this@OnboardingActivity, 24),
+                    SvgHelper.dp(this@OnboardingActivity, 24)
+                )
+            }
+            setOnClickListener {
+                if (pager.currentItem < visiblePages.size - 1) {
+                    pager.currentItem = pager.currentItem + 1
+                } else {
+                    finishOnb()
+                }
             }
         }
+        col.addView(btn)
 
         setContentView(root)
         ThemeHelper.applySystemBars(this, config)
     }
 
-    private fun finishOnboarding() {
-        val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
-        prefs.edit().putBoolean("onb_shown", true).apply()
+    private fun finishOnb() {
+        getSharedPreferences(PREFS, MODE_PRIVATE)
+            .edit()
+            .putBoolean(SplashActivity.KEY_ONB, true)
+            .apply()
 
         val next = if (config.welcome.active) {
             WelcomeActivity::class.java
@@ -92,94 +105,129 @@ class OnboardingActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun loadFont(): Typeface? {
-        return try {
-            androidx.core.content.res.ResourcesCompat.getFont(this, R.font.lalezar)
-        } catch (e: Exception) {
-            null
-        }
+    private fun loadFont(): Typeface? = try {
+        ResourcesCompat.getFont(this, R.font.lalezar)
+    } catch (e: Exception) {
+        null
     }
 
+    // =========================================================
+    // Adapter
+    // =========================================================
     inner class OnbAdapter(
         private val pages: List<OnbPage>,
         private val txtColor: String
     ) : RecyclerView.Adapter<OnbAdapter.VH>() {
 
         inner class VH(v: View) : RecyclerView.ViewHolder(v) {
-            val iconHolder: FrameLayout = v.findViewWithTag("iconHolder")
-            val tvTitle: TextView = v.findViewWithTag("tvTitle")
-            val tvDesc: TextView = v.findViewWithTag("tvDesc")
+            val boxTop: LinearLayout    = v.findViewWithTag("top")
+            val boxCenter: LinearLayout = v.findViewWithTag("center")
+            val boxBottom: LinearLayout = v.findViewWithTag("bottom")
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
             val ctx = parent.context
 
-            val wrap = LinearLayout(ctx)
-            wrap.orientation = LinearLayout.VERTICAL
-            wrap.gravity = Gravity.CENTER
-            wrap.layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-            wrap.setPadding(
-                SvgHelper.dp(ctx, 24),
-                SvgHelper.dp(ctx, 24),
-                SvgHelper.dp(ctx, 24),
-                SvgHelper.dp(ctx, 24)
-            )
+            val col = LinearLayout(ctx).apply {
+                orientation = LinearLayout.VERTICAL
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
+                setPadding(
+                    SvgHelper.dp(ctx, PAD),
+                    SvgHelper.dp(ctx, PAD),
+                    SvgHelper.dp(ctx, PAD),
+                    SvgHelper.dp(ctx, PAD)
+                )
+            }
 
-            val iconHolder = FrameLayout(ctx)
-            iconHolder.tag = "iconHolder"
-            iconHolder.layoutParams = LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-            wrap.addView(iconHolder)
+            val top    = makeBox(ctx).apply { tag = "top" }
+            val center = makeBox(ctx).apply { tag = "center" }
+            val bottom = makeBox(ctx).apply { tag = "bottom" }
 
-            val tvTitle = TextView(ctx)
-            tvTitle.tag = "tvTitle"
-            tvTitle.gravity = Gravity.CENTER
-            tvTitle.setPadding(0, SvgHelper.dp(ctx, 16), 0, SvgHelper.dp(ctx, 8))
-            wrap.addView(tvTitle)
+            col.addView(top)
+            col.addView(center)
+            col.addView(bottom)
 
-            val tvDesc = TextView(ctx)
-            tvDesc.tag = "tvDesc"
-            tvDesc.gravity = Gravity.CENTER
-            wrap.addView(tvDesc)
-
-            return VH(wrap)
+            return VH(col)
         }
 
         override fun onBindViewHolder(holder: VH, position: Int) {
             val page = pages[position]
+            val ctx = holder.itemView.context
 
-            holder.iconHolder.removeAllViews()
-            if (!page.iconSvg.isNullOrBlank()) {
+            // پاک کردن قبلی
+            holder.boxTop.removeAllViews()
+            holder.boxCenter.removeAllViews()
+            holder.boxBottom.removeAllViews()
+
+            // --- آیکون ---
+            if (page.iconPos != "hidden" && page.iconSvg.isNotBlank()) {
+                val holderBox = FrameLayout(ctx)
                 SvgHelper.buildIconView(
-                    holder.itemView.context,
-                    holder.iconHolder,
-                    page.iconSvg,
-                    page.iconSize,
-                    page.iconBoxSize,
-                    page.iconBgOn,
-                    page.iconBg,
-                    page.iconShape,
-                    page.iconColorOn,
-                    page.iconColor
+                    ctx, holderBox,
+                    page.iconSvg, page.iconSize, page.iconBoxSize,
+                    page.iconBgOn, page.iconBg, page.iconShape,
+                    page.iconColorOn, page.iconColor
                 )
+                pickBox(holder, page.iconPos).addView(holderBox)
             }
 
-            holder.tvTitle.text = page.t
-            holder.tvTitle.textSize = page.tSize.toFloat()
-            holder.tvTitle.setTextColor(SvgHelper.parseColor(txtColor))
-            holder.tvTitle.typeface = loadFont()
+            // --- متن (عنوان + زیرمتن با هم) ---
+            if (page.textPos != "hidden") {
+                val textBox = LinearLayout(ctx).apply {
+                    orientation = LinearLayout.VERTICAL
+                    gravity = Gravity.CENTER
+                    setPadding(0, SvgHelper.dp(ctx, 16), 0, 0)
+                }
 
-            holder.tvDesc.text = page.d
-            holder.tvDesc.textSize = page.dSize.toFloat()
-            holder.tvDesc.setTextColor(SvgHelper.parseColor(txtColor))
-            holder.tvDesc.typeface = loadFont()
+                val tvTitle = TextView(ctx).apply {
+                    text = page.t
+                    textSize = page.tSize.toFloat()
+                    setTextColor(SvgHelper.parseColor(txtColor))
+                    gravity = Gravity.CENTER
+                    typeface = loadFont()
+                }
+                textBox.addView(tvTitle)
+
+                val tvDesc = TextView(ctx).apply {
+                    text = page.d
+                    textSize = page.dSize.toFloat()
+                    setTextColor(SvgHelper.parseColor(txtColor))
+                    gravity = Gravity.CENTER
+                    typeface = loadFont()
+                    setPadding(0, SvgHelper.dp(ctx, 8), 0, 0)
+                }
+                textBox.addView(tvDesc)
+
+                pickBox(holder, page.textPos).addView(textBox)
+            }
         }
 
         override fun getItemCount(): Int = pages.size
+
+        private fun makeBox(ctx: android.content.Context): LinearLayout =
+            LinearLayout(ctx).apply {
+                orientation = LinearLayout.VERTICAL
+                gravity = Gravity.CENTER
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    0, 1f
+                )
+            }
+
+        private fun pickBox(holder: VH, pos: String): LinearLayout = when (pos) {
+            "top"    -> holder.boxTop
+            "center" -> holder.boxCenter
+            "bottom" -> holder.boxBottom
+            else     -> holder.boxCenter
+        }
+    }
+
+    companion object {
+        private const val PAD = 24
+        private const val BTN_TEXT = "بعدی"
+        private const val PREFS = "app_prefs"
     }
 }
