@@ -10,11 +10,18 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 
 /**
  * صفحه خطا.
- * نوع خطا از intent میاد: offline, timeout, dns, ssl, e404, e500, down, unknown
- * اطلاعات نمایش از error.items[type] خونده میشه.
+ *
+ * قانون:
+ *  - نوع خطا از intent میاد (کلید items)
+ *  - اگه items[type] توی json نبود → items["unknown"]
+ *  - اگه items["unknown"] هم نبود → items.values.first()
+ *  - پس‌زمینه از error.bg/bgMode/bg2/bgAngle
+ *  - متن/رنگ/آیکون از error.items[type]
+ *  - دکمه تلاش مجدد از error.retryText / btnBg / btnShape / btnStyle
  */
 class ErrorActivity : AppCompatActivity() {
 
@@ -23,125 +30,119 @@ class ErrorActivity : AppCompatActivity() {
 
         val config = ConfigLoader.load(this)
         val err = config.error
-        val type = intent.getStringExtra("error_type") ?: "unknown"
+        val type = intent.getStringExtra(WebActivity.EXTRA_ERROR_TYPE) ?: "unknown"
 
+        // انتخاب آیتم خطا از json
         val item = err.items[type]
             ?: err.items["unknown"]
-            ?: err.items.values.firstOrNull()
-            ?: error("error.items is empty in config.json")
+            ?: err.items.values.first()
 
         val root = FrameLayout(this)
         root.background = SvgHelper.makeBackground(err.bgMode, err.bg, err.bg2, err.bgAngle)
 
-        val col = LinearLayout(this)
-        col.orientation = LinearLayout.VERTICAL
-        col.gravity = Gravity.CENTER
-        col.layoutParams = FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.MATCH_PARENT,
-            FrameLayout.LayoutParams.MATCH_PARENT
-        )
-        col.setPadding(
-            SvgHelper.dp(this, 24),
-            SvgHelper.dp(this, 24),
-            SvgHelper.dp(this, 24),
-            SvgHelper.dp(this, 24)
-        )
+        val col = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            )
+            setPadding(
+                SvgHelper.dp(this@ErrorActivity, PAD),
+                SvgHelper.dp(this@ErrorActivity, PAD),
+                SvgHelper.dp(this@ErrorActivity, PAD),
+                SvgHelper.dp(this@ErrorActivity, PAD)
+            )
+        }
         root.addView(col)
 
-        // آیکون
-        if (item.iconSvg != null && item.iconSvg.isNotBlank()) {
-            val iconHolder = FrameLayout(this)
-            val holderSize = SvgHelper.dp(this, item.iconBoxSize)
-            val lp = LinearLayout.LayoutParams(holderSize, holderSize)
-            lp.gravity = Gravity.CENTER_HORIZONTAL
-            lp.bottomMargin = SvgHelper.dp(this, 16)
-            iconHolder.layoutParams = lp
+        // --- آیکون ---
+        if (item.iconSvg.isNotBlank()) {
+            val holder = FrameLayout(this)
             SvgHelper.buildIconView(
-                this,
-                iconHolder,
-                item.iconSvg,
-                item.iconSize,
-                item.iconBoxSize,
-                item.iconBgOn,
-                item.iconBg,
-                item.iconShape,
-                item.iconColorOn,
-                item.iconColor
+                this, holder,
+                item.iconSvg, item.iconSize, item.iconBoxSize,
+                item.iconBgOn, item.iconBg, item.iconShape,
+                item.iconColorOn, item.iconColor
             )
-            col.addView(iconHolder)
+            val lp = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                gravity = Gravity.CENTER_HORIZONTAL
+                bottomMargin = SvgHelper.dp(this@ErrorActivity, 16)
+            }
+            holder.layoutParams = lp
+            col.addView(holder)
         }
 
-        // عنوان
+        // --- عنوان ---
         if (item.t.isNotBlank()) {
-            val tv = TextView(this)
-            tv.text = item.t
-            tv.textSize = err.tSize.toFloat()
-            tv.setTextColor(SvgHelper.parseColor(err.txt))
-            tv.gravity = Gravity.CENTER
-            tv.typeface = loadFont()
+            val tv = TextView(this).apply {
+                text = item.t
+                textSize = err.tSize.toFloat()
+                setTextColor(SvgHelper.parseColor(err.txt))
+                gravity = Gravity.CENTER
+                typeface = loadFont()
+            }
             val lp = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            lp.gravity = Gravity.CENTER_HORIZONTAL
-            lp.bottomMargin = SvgHelper.dp(this, 8)
+            ).apply {
+                gravity = Gravity.CENTER_HORIZONTAL
+                bottomMargin = SvgHelper.dp(this@ErrorActivity, 8)
+            }
             tv.layoutParams = lp
             col.addView(tv)
         }
 
-        // توضیح
+        // --- توضیح ---
         if (item.d.isNotBlank()) {
-            val tv = TextView(this)
-            tv.text = item.d
-            tv.textSize = err.dSize.toFloat()
-            tv.setTextColor(SvgHelper.parseColor(err.txt))
-            tv.gravity = Gravity.CENTER
-            tv.typeface = loadFont()
+            val tv = TextView(this).apply {
+                text = item.d
+                textSize = err.dSize.toFloat()
+                setTextColor(SvgHelper.parseColor(err.txt))
+                gravity = Gravity.CENTER
+                typeface = loadFont()
+            }
             val lp = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            lp.gravity = Gravity.CENTER_HORIZONTAL
-            lp.bottomMargin = SvgHelper.dp(this, 24)
+            ).apply {
+                gravity = Gravity.CENTER_HORIZONTAL
+                bottomMargin = SvgHelper.dp(this@ErrorActivity, 24)
+            }
             tv.layoutParams = lp
             col.addView(tv)
         }
 
-        // دکمه تلاش مجدد
+        // --- دکمه تلاش مجدد ---
         if (err.retryText.isNotBlank()) {
-            val btn = Button(this)
-            btn.text = err.retryText
-            btn.setTextColor(SvgHelper.parseColor("#FFFFFF"))
-            btn.typeface = loadFont()
-            btn.isAllCaps = false
-
-            val bg = GradientDrawable()
-            bg.setColor(SvgHelper.parseColor(err.btnBg))
-            when (err.btnShape.lowercase()) {
-                "circle" -> bg.cornerRadius = 999f
-                "rounded" -> bg.cornerRadius = SvgHelper.dp(this, 8).toFloat()
-                "square" -> bg.cornerRadius = 0f
-                else -> bg.cornerRadius = SvgHelper.dp(this, 8).toFloat()
+            val btn = Button(this).apply {
+                text = err.retryText
+                textSize = 16f
+                setTextColor(0xFFFFFFFF.toInt())
+                typeface = loadFont()
+                isAllCaps = false
+                background = buildButtonBackground(err)
+                setPadding(
+                    SvgHelper.dp(this@ErrorActivity, 32),
+                    SvgHelper.dp(this@ErrorActivity, 12),
+                    SvgHelper.dp(this@ErrorActivity, 32),
+                    SvgHelper.dp(this@ErrorActivity, 12)
+                )
+                setOnClickListener {
+                    startActivity(Intent(this@ErrorActivity, WebActivity::class.java))
+                    finish()
+                }
             }
-            btn.background = bg
-
             val lp = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            lp.gravity = Gravity.CENTER_HORIZONTAL
-            btn.layoutParams = lp
-            btn.setPadding(
-                SvgHelper.dp(this, 32),
-                SvgHelper.dp(this, 12),
-                SvgHelper.dp(this, 32),
-                SvgHelper.dp(this, 12)
-            )
-
-            btn.setOnClickListener {
-                startActivity(Intent(this, WebActivity::class.java))
-                finish()
+            ).apply {
+                gravity = Gravity.CENTER_HORIZONTAL
             }
+            btn.layoutParams = lp
             col.addView(btn)
         }
 
@@ -149,11 +150,39 @@ class ErrorActivity : AppCompatActivity() {
         ThemeHelper.applySystemBars(this, config)
     }
 
-    private fun loadFont(): Typeface? {
-        return try {
-            androidx.core.content.res.ResourcesCompat.getFont(this, R.font.lalezar)
-        } catch (e: Exception) {
-            null
+    /**
+     * پس‌زمینه دکمه بر اساس error.btnShape / btnStyle / btnBg
+     */
+    private fun buildButtonBackground(err: ErrorConfig): GradientDrawable {
+        val bg = GradientDrawable()
+        val bgColor = SvgHelper.parseColor(err.btnBg)
+
+        when (err.btnStyle) {
+            "outline" -> {
+                bg.setColor(0x00000000)
+                bg.setStroke(SvgHelper.dp(this, 2), bgColor)
+            }
+            else -> {
+                bg.setColor(bgColor)
+            }
         }
+
+        when (err.btnShape) {
+            "pill"    -> bg.cornerRadius = 999f
+            "square"  -> bg.cornerRadius = 0f
+            "rounded" -> bg.cornerRadius = SvgHelper.dp(this, 8).toFloat()
+        }
+
+        return bg
+    }
+
+    private fun loadFont(): Typeface? = try {
+        ResourcesCompat.getFont(this, R.font.lalezar)
+    } catch (e: Exception) {
+        null
+    }
+
+    companion object {
+        private const val PAD = 24
     }
 }
