@@ -5,7 +5,9 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
+import android.os.Message
 import android.webkit.CookieManager
+import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
@@ -24,6 +26,9 @@ import androidx.appcompat.app.AppCompatActivity
  *  - deepLink از web.deepLink → اسکیم‌های غیر http
  *  - browserOnly از web.browserOnly → لیست دامنه‌هایی که همیشه توی مرورگر باز شن
  *  - خطاها بر اساس کد WebView → یکی از کلیدهای error.items
+ *
+ * تغییر جدید:
+ *  - target="_blank" و پنجره‌های جدید توی همون WebView باز می‌شن
  */
 class WebActivity : AppCompatActivity() {
 
@@ -57,6 +62,10 @@ class WebActivity : AppCompatActivity() {
         settings.displayZoomControls = false
         settings.cacheMode = WebSettings.LOAD_DEFAULT
         settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+
+        // مهم برای دکمه‌های ورود که پنجره جدید باز می‌کنن (target="_blank")
+        settings.javaScriptCanOpenWindowsAutomatically = true
+        settings.setSupportMultipleWindows(true)
 
         // --- کوکی‌ها بر اساس keepSession ---
         if (web.keepSession) {
@@ -126,6 +135,43 @@ class WebActivity : AppCompatActivity() {
                 if (request.isForMainFrame) {
                     gotoError(mapErrorCode(error.errorCode))
                 }
+            }
+        }
+
+        // --- WebChromeClient — برای target="_blank" و پنجره‌های جدید ---
+        webView.webChromeClient = object : WebChromeClient() {
+
+            override fun onCreateWindow(
+                view: WebView,
+                isDialog: Boolean,
+                isUserGesture: Boolean,
+                resultMsg: Message
+            ): Boolean {
+                // پنجره جدید رو توی همون WebView اصلی باز کن
+                val newWebView = WebView(view.context)
+                newWebView.settings.apply {
+                    javaScriptEnabled = true
+                    domStorageEnabled = true
+                    setSupportMultipleWindows(true)
+                    javaScriptCanOpenWindowsAutomatically = true
+                }
+
+                val transport = resultMsg.obj as WebView.WebViewTransport
+                transport.webView = newWebView
+                resultMsg.sendToTarget()
+
+                // URL پنجره جدید رو توی WebView اصلی لود کن
+                newWebView.webViewClient = object : WebViewClient() {
+                    override fun shouldOverrideUrlLoading(
+                        view: WebView,
+                        request: WebResourceRequest
+                    ): Boolean {
+                        webView.loadUrl(request.url.toString())
+                        return true
+                    }
+                }
+
+                return true
             }
         }
 
