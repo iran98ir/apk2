@@ -1,11 +1,13 @@
 package ir.apkbuilder
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.Gravity
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -27,13 +29,17 @@ import androidx.viewpager2.widget.ViewPager2
  *  - Dots پایین: صفحه فعلی = مستطیل دو سر گرد نئونی، بقیه = نقطه پر
  *  - رنگ Dots = onb.txt با افکت نئون/درخشان
  *  - بدون دکمه Next — فقط Swipe
+ *  - توی صفحه آخر، یه سوایپ دیگه به چپ → Welcome
  */
 class OnboardingActivity : AppCompatActivity() {
 
     private lateinit var config: AppConfig
     private lateinit var dotsContainer: LinearLayout
+    private lateinit var pager: ViewPager2
     private var totalPages: Int = 0
+    private var currentPage: Int = 0
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         config = ConfigLoader.load(this)
@@ -56,7 +62,7 @@ class OnboardingActivity : AppCompatActivity() {
         val visiblePages = onb.pages.take(count)
         totalPages = visiblePages.size
 
-        val pager = ViewPager2(this).apply {
+        pager = ViewPager2(this).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f
             )
@@ -82,17 +88,65 @@ class OnboardingActivity : AppCompatActivity() {
 
         pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
+                currentPage = position
                 buildDots(onb.txt, position)
             }
         })
+
+        // تشخیص سوایپ اضافی به چپ توی صفحه آخر
+        pager.getChildAt(0).setOnTouchListener { _, event ->
+            handleExtraSwipe(event)
+            false
+        }
 
         setContentView(root)
         ThemeHelper.applySystemBars(this, config)
     }
 
     /**
-     * ساخت Dots نئونی.
+     * اگه کاربر توی صفحه آخر بود و به چپ کشید → برو Welcome
      */
+    private var touchStartX: Float = 0f
+    private var touchStartY: Float = 0f
+
+    private fun handleExtraSwipe(event: MotionEvent) {
+        if (totalPages == 0) return
+        if (currentPage != totalPages - 1) return
+
+        when (event.action) {
+            MotionEvent.ACTION_DOWN -> {
+                touchStartX = event.x
+                touchStartY = event.y
+            }
+            MotionEvent.ACTION_UP -> {
+                val dx = event.x - touchStartX
+                val dy = event.y - touchStartY
+                // سوایپ به چپ: dx منفی، و افقی بیشتر از عمودی
+                if (dx < -SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy)) {
+                    finishOnb()
+                }
+            }
+        }
+    }
+
+    private fun finishOnb() {
+        getSharedPreferences(PREFS, MODE_PRIVATE)
+            .edit()
+            .putBoolean(SplashActivity.KEY_ONB, true)
+            .apply()
+
+        val next = if (config.welcome.active) {
+            WelcomeActivity::class.java
+        } else {
+            WebActivity::class.java
+        }
+        startActivity(Intent(this, next))
+        finish()
+    }
+
+    // =========================================================
+    // Dots نئونی
+    // =========================================================
     private fun buildDots(txtColor: String, current: Int) {
         dotsContainer.removeAllViews()
 
@@ -117,7 +171,7 @@ class OnboardingActivity : AppCompatActivity() {
                 }
             }
 
-            // هاله نئونی (لایه زیر)
+            // هاله نئونی
             val glow = View(this).apply {
                 layoutParams = FrameLayout.LayoutParams(
                     FrameLayout.LayoutParams.MATCH_PARENT,
@@ -284,5 +338,7 @@ class OnboardingActivity : AppCompatActivity() {
 
     companion object {
         private const val PAD = 24
+        private const val SWIPE_THRESHOLD = 80f
+        private const val PREFS = "app_prefs"
     }
 }
