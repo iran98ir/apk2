@@ -2,9 +2,9 @@
     "brand": {
         "mode": "new",
         "name": "mu✂️mu",
-        "pkg": "ir.rayansaz01",
-        "ver": "3.14.07",
-        "vcode": 31
+        "pkg": "ir.rayan03",
+        "ver": "3.14.08",
+        "vcode": 5
     },
     "splash": {
         "bgMode": "gradient",
@@ -18,8 +18,8 @@
         "iconBgOn": false,
         "iconBg": "#EEF2FF",
         "iconShape": "rounded",
-        "iconBoxSize": 122,
-        "iconSize": 140,
+        "iconBoxSize": 200,
+        "iconSize": 104,
         "hasText": true,
         "title": "MU✂️MU",
         "tSize": 28,
@@ -37,12 +37,12 @@
                 "iconBg": "#1E293B",
                 "iconShape": "circle",
                 "iconBoxSize": 200,
-                "iconSize": 140,
+                "iconSize": 78,
                 "t": "آرامش خاطر، از اولین قدم",
                 "tSize": 18,
                 "d": "مشاوره کاملاً ناشناس\nبدون ثبت شماره تماس\n\nرابط کاربری ساده و روان\nطراحی‌شده برای تجربه‌ای راحت و مطمئن",
-                "dSize": 15,
-                "iconPos": "top",
+                "dSize": 14,
+                "iconPos": "center",
                 "textPos": "bottom"
             },
             {
@@ -58,7 +58,7 @@
                 "tSize": 18,
                 "d": "محاسبه ساده و یکپارچه قیمت\nبر اساس طول و وزن دقیق مو",
                 "dSize": 15,
-                "iconPos": "top",
+                "iconPos": "center",
                 "textPos": "bottom"
             },
             {
@@ -102,19 +102,19 @@
         "iconBgOn": false,
         "iconBg": "#4F46E5",
         "iconShape": "circle",
-        "iconBoxSize": 200,
-        "iconSize": 102,
+        "iconBoxSize": 132,
+        "iconSize": 58,
         "t": "اگر vpn روشن است آن را خاموش کنید",
         "tSize": 24,
         "d": "دسترسی فقط از داخل ایران امکان پذیر است\nبنابراین پیش از ورود فیلترشکن خود را خاموش کنید",
         "dSize": 15,
         "btn": "ورود",
         "btnShape": "pill",
-        "btnStyle": "elevated",
+        "btnStyle": "flat",
         "btnBg": "#16A34A",
         "btnTxt": "#FFFFFF",
-        "btnSize": 18,
-        "btnRadius": 11,
+        "btnSize": 14,
+        "btnRadius": 2,
         "iconPos": "top",
         "textPos": "center",
         "btnPos": "bottom"
@@ -128,7 +128,7 @@
         "browserOnly": "https://rosha-24.ir/x7q"
     },
     "exit": {
-        "active": true,
+        "active": false,
         "t": "خارج شدن ؟",
         "m": "روزانه پیامها را بررسی کنید",
         "bg": "#FFB5D1",
