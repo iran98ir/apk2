@@ -10,6 +10,7 @@ prepare.py
 - کپی font/lalezar.ttf به res/font
 - کپی config.json به assets
 - ساخت themes.xml (بدون هاردکد، از welcome.bg)
+- ساخت app/build.gradle.kts با applicationId و نسخه از json
 """
 
 import json
@@ -147,8 +148,6 @@ def write_manifest(pkg: str, version_name: str, version_code: int):
 
 </manifest>
 '''
-    # pkg/version_name/version_code در build.gradle.kts استفاده می‌شن،
-    # نه در manifest — ولی برای آینده اینجا پارام می‌گیرن
     (APP_DIR / "AndroidManifest.xml").write_text(content, encoding="utf-8")
 
 
@@ -178,7 +177,6 @@ def copy_icon(src: Path, res: Path):
             resized = img2.resize((size, size), Image.LANCZOS)
             resized.save(out / "ic_launcher_round.png", "PNG")
     else:
-        # اگه آیکون گرد ندادی، همون عادی رو کپی کن
         for folder, size in sizes.items():
             out = res / folder
             resized = img.resize((size, size), Image.LANCZOS)
@@ -245,6 +243,8 @@ dependencies {{
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
+    implementation("androidx.viewpager2:viewpager2:1.1.0")
     implementation("com.caverock:androidsvg-aar:1.4")
     implementation("com.google.android.material:material:1.12.0")
 }}
@@ -255,7 +255,7 @@ dependencies {{
 def main():
     cfg = load_config()
 
-    # فیلدهای اجباری (اگه نبودن -> خطا)
+    # فیلدهای اجباری
     name = require(cfg, "brand.name")
     pkg = require(cfg, "brand.pkg")
     ver = require(cfg, "brand.ver")
@@ -265,7 +265,6 @@ def main():
     if not isinstance(vcode, int):
         fail("brand.vcode must be an integer")
 
-    # اعتبارسنجی pkg
     if not all(c.islower() or c.isdigit() or c == "." for c in pkg):
         fail(f"brand.pkg must contain only lowercase letters, digits and dots: {pkg}")
 
