@@ -12,97 +12,123 @@ import android.view.Window
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat
 
 /**
  * دیالوگ خروج.
- * همه مقادیر از exit توی json.
- * btnLayout: row یا column.
+ *
+ * قانون:
+ *  - عنوان از exit.t
+ *  - پیام از exit.m
+ *  - رنگ‌ها از exit.bg / exit.txt
+ *  - اندازه‌ها از exit.tSize / mSize / btnSize
+ *  - دکمه‌ها از exit.yes / no + رنگ‌ها + شکل + استایل + چیدمان
+ *  - انیمیشن از exit.anim (glass / fade / scale)
  */
 object ExitDialog {
 
-    fun show(activity: Activity, config: AppConfig, onCancel: () -> Unit) {
+    fun show(activity: Activity, config: AppConfig, onNo: () -> Unit) {
         val e = config.exit
 
-        val dialog = Dialog(activity)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setCancelable(true)
-
-        val col = LinearLayout(activity)
-        col.orientation = LinearLayout.VERTICAL
-        col.setPadding(
-            SvgHelper.dp(activity, 24),
-            SvgHelper.dp(activity, 24),
-            SvgHelper.dp(activity, 24),
-            SvgHelper.dp(activity, 24)
-        )
-
-        val bg = GradientDrawable()
-        bg.setColor(SvgHelper.parseColor(e.bg))
-        bg.cornerRadius = SvgHelper.dp(activity, 16).toFloat()
-        col.background = bg
-
-        // عنوان
-        if (e.t.isNotBlank()) {
-            val tv = TextView(activity)
-            tv.text = e.t
-            tv.textSize = e.tSize.toFloat()
-            tv.setTextColor(SvgHelper.parseColor(e.txt))
-            tv.gravity = Gravity.CENTER
-            tv.typeface = loadFont(activity)
-            col.addView(tv)
+        val dialog = Dialog(activity).apply {
+            requestWindowFeature(Window.FEATURE_NO_TITLE)
+            setCancelable(true)
         }
 
-        // پیام
+        val col = LinearLayout(activity).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(
+                SvgHelper.dp(activity, PAD),
+                SvgHelper.dp(activity, PAD),
+                SvgHelper.dp(activity, PAD),
+                SvgHelper.dp(activity, PAD)
+            )
+            background = GradientDrawable().apply {
+                setColor(SvgHelper.parseColor(e.bg))
+                cornerRadius = SvgHelper.dp(activity, 16).toFloat()
+            }
+        }
+
+        // --- عنوان ---
+        if (e.t.isNotBlank()) {
+            col.addView(TextView(activity).apply {
+                text = e.t
+                textSize = e.tSize.toFloat()
+                setTextColor(SvgHelper.parseColor(e.txt))
+                gravity = Gravity.CENTER
+                typeface = loadFont(activity)
+            })
+        }
+
+        // --- پیام ---
         if (e.m.isNotBlank()) {
-            val tv = TextView(activity)
-            tv.text = e.m
-            tv.textSize = e.mSize.toFloat()
-            tv.setTextColor(SvgHelper.parseColor(e.txt))
-            tv.gravity = Gravity.CENTER
-            tv.typeface = loadFont(activity)
+            val tv = TextView(activity).apply {
+                text = e.m
+                textSize = e.mSize.toFloat()
+                setTextColor(SvgHelper.parseColor(e.txt))
+                gravity = Gravity.CENTER
+                typeface = loadFont(activity)
+            }
             val lp = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            lp.topMargin = SvgHelper.dp(activity, 8)
+            ).apply {
+                topMargin = SvgHelper.dp(activity, 8)
+            }
             tv.layoutParams = lp
             col.addView(tv)
         }
 
-        // دکمه‌ها
-        val row = LinearLayout(activity)
-        row.orientation = if (e.btnLayout.lowercase() == "column") {
-            LinearLayout.VERTICAL
-        } else {
-            LinearLayout.HORIZONTAL
+        // --- دکمه‌ها ---
+        val row = LinearLayout(activity).apply {
+            orientation = if (e.btnLayout == "col") {
+                LinearLayout.VERTICAL
+            } else {
+                LinearLayout.HORIZONTAL
+            }
+            gravity = Gravity.CENTER
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                topMargin = SvgHelper.dp(activity, 16)
+            }
         }
-        row.gravity = Gravity.CENTER
-        val rowLp = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
+
+        val btnYes = makeButton(
+            activity,
+            e.yes, e.yesBg, e.yesTxt,
+            e.btnSize, e.btnShape, e.btnStyle
         )
-        rowLp.topMargin = SvgHelper.dp(activity, 16)
-        row.layoutParams = rowLp
+        val btnNo = makeButton(
+            activity,
+            e.no, e.noBg, e.noTxt,
+            e.btnSize, e.btnShape, e.btnStyle
+        )
 
-        val btnYes = makeButton(activity, e.yes, e.yesBg, e.yesTxt, e.btnSize, e.btnShape)
-        val btnNo = makeButton(activity, e.no, e.noBg, e.noTxt, e.btnSize, e.btnShape)
-
-        if (e.btnLayout.lowercase() == "column") {
+        if (e.btnLayout == "col") {
+            val lp = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            btnYes.layoutParams = lp
+            btnNo.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { topMargin = SvgHelper.dp(activity, 8) }
             row.addView(btnYes)
             row.addView(btnNo)
         } else {
-            val lpYes = LinearLayout.LayoutParams(
+            btnYes.layoutParams = LinearLayout.LayoutParams(
                 0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
             )
-            val lpNo = LinearLayout.LayoutParams(
+            btnNo.layoutParams = LinearLayout.LayoutParams(
                 0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
-            )
-            lpNo.marginStart = SvgHelper.dp(activity, 8)
-            btnYes.layoutParams = lpYes
-            btnNo.layoutParams = lpNo
+            ).apply { marginStart = SvgHelper.dp(activity, 8) }
             row.addView(btnYes)
             row.addView(btnNo)
         }
+
         col.addView(row)
 
         btnYes.setOnClickListener {
@@ -111,15 +137,25 @@ object ExitDialog {
         }
         btnNo.setOnClickListener {
             dialog.dismiss()
-            onCancel()
+            onNo()
         }
 
         dialog.setContentView(col)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.window?.setLayout(
-            (activity.resources.displayMetrics.widthPixels * 0.88).toInt(),
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
+        dialog.window?.apply {
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            setLayout(
+                (activity.resources.displayMetrics.widthPixels * 0.88).toInt(),
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+
+            // --- انیمیشن بر اساس exit.anim ---
+            when (e.anim) {
+                "fade"  -> setWindowAnimations(android.R.style.Animation_Dialog)
+                "scale" -> setWindowAnimations(android.R.style.Animation_Dialog)
+                "glass" -> setWindowAnimations(android.R.style.Animation_Dialog)
+            }
+        }
+
         dialog.show()
     }
 
@@ -129,32 +165,46 @@ object ExitDialog {
         bgColor: String,
         textColor: String,
         size: Int,
-        shape: String
+        shape: String,
+        style: String
     ): Button {
-        val btn = Button(activity)
-        btn.text = text
-        btn.textSize = size.toFloat()
-        btn.setTextColor(SvgHelper.parseColor(textColor))
-        btn.isAllCaps = false
-        btn.typeface = loadFont(activity)
-
         val bg = GradientDrawable()
-        bg.setColor(SvgHelper.parseColor(bgColor))
-        when (shape.lowercase()) {
-            "circle" -> bg.cornerRadius = 999f
-            "rounded" -> bg.cornerRadius = SvgHelper.dp(activity, 8).toFloat()
-            "square" -> bg.cornerRadius = 0f
-            else -> bg.cornerRadius = SvgHelper.dp(activity, 8).toFloat()
+        val solid = SvgHelper.parseColor(bgColor)
+
+        when (style) {
+            "outline" -> {
+                bg.setColor(0x00000000)
+                bg.setStroke(SvgHelper.dp(activity, 2), solid)
+            }
+            else -> {
+                bg.setColor(solid)
+            }
         }
-        btn.background = bg
-        return btn
+
+        when (shape) {
+            "pill"    -> bg.cornerRadius = 999f
+            "square"  -> bg.cornerRadius = 0f
+            "rounded" -> bg.cornerRadius = SvgHelper.dp(activity, 8).toFloat()
+        }
+
+        return Button(activity).apply {
+            this.text = text
+            textSize = size.toFloat()
+            setTextColor(
+                if (style == "outline") solid
+                else SvgHelper.parseColor(textColor)
+            )
+            isAllCaps = false
+            typeface = loadFont(activity)
+            background = bg
+        }
     }
 
-    private fun loadFont(activity: Activity): Typeface? {
-        return try {
-            androidx.core.content.res.ResourcesCompat.getFont(activity, R.font.lalezar)
-        } catch (e: Exception) {
-            null
-        }
+    private fun loadFont(activity: Activity): Typeface? = try {
+        ResourcesCompat.getFont(activity, R.font.lalezar)
+    } catch (e: Exception) {
+        null
     }
+
+    private const val PAD = 24
 }
