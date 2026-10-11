@@ -1,12 +1,13 @@
 package ir.apkbuilder
 
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -16,18 +17,22 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 
 /**
- * صفحه آنبوردینگ.
+ * صفحه آنبوردینگ — نسخه نهایی.
  *
  * قانون:
- *  - تعداد صفحات نمایشی از onb.count ("2" یا "3")
- *  - صفحات از onb.pages (آرایه json)
- *  - پس‌زمینه از onb.bg/bgMode/bg2/bgAngle
+ *  - تعداد صفحات نمایشی از onb.count
+ *  - محتوا از onb.pages
+ *  - پس‌زمینه از onb.bgMode/bg/bg2/bgAngle
  *  - رنگ متن از onb.txt
- *  - هر صفحه: آیکون + عنوان + زیرمتن با موقعیت از json
+ *  - Dots پایین: صفحه فعلی = مستطیل دو سر گرد نئونی، بقیه = نقطه پر
+ *  - رنگ Dots = onb.txt با افکت نئون/درخشان
+ *  - بدون دکمه Next — فقط Swipe
  */
 class OnboardingActivity : AppCompatActivity() {
 
     private lateinit var config: AppConfig
+    private lateinit var dotsContainer: LinearLayout
+    private var totalPages: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,61 +53,137 @@ class OnboardingActivity : AppCompatActivity() {
         root.addView(col)
 
         // تعداد نمایشی
-        val total = onb.count.toIntOrNull() ?: onb.pages.size
-        val visiblePages = onb.pages.take(total)
+        val count = onb.count.toIntOrNull() ?: onb.pages.size
+        val visiblePages = onb.pages.take(count)
+        totalPages = visiblePages.size
 
+        // ViewPager2 — سوایپ
         val pager = ViewPager2(this).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f
             )
             adapter = OnbAdapter(visiblePages, onb.txt)
+            offscreenPageLimit = 1
         }
         col.addView(pager)
 
-        // دکمه پایین (متن ثابت — توی json نیست)
-        val btn = Button(this).apply {
-            text = BTN_TEXT
-            setTextColor(SvgHelper.parseColor(onb.txt))
-            typeface = loadFont()
-            isAllCaps = false
+        // Dots پایین
+        dotsContainer = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
-                setMargins(
-                    SvgHelper.dp(this@OnboardingActivity, 24),
-                    SvgHelper.dp(this@OnboardingActivity, 8),
-                    SvgHelper.dp(this@OnboardingActivity, 24),
-                    SvgHelper.dp(this@OnboardingActivity, 24)
-                )
-            }
-            setOnClickListener {
-                if (pager.currentItem < visiblePages.size - 1) {
-                    pager.currentItem = pager.currentItem + 1
-                } else {
-                    finishOnb()
-                }
+                bottomMargin = SvgHelper.dp(this@OnboardingActivity, 40)
+                topMargin = SvgHelper.dp(this@OnboardingActivity, 20)
             }
         }
-        col.addView(btn)
+        col.addView(dotsContainer)
+
+        buildDots(onb.txt, 0)
+
+        // listener برای تغییر صفحه
+        pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                buildDots(onb.txt, position)
+            }
+        })
 
         setContentView(root)
         ThemeHelper.applySystemBars(this, config)
     }
 
-    private fun finishOnb() {
-        getSharedPreferences(PREFS, MODE_PRIVATE)
-            .edit()
-            .putBoolean(SplashActivity.KEY_ONB, true)
-            .apply()
+    /**
+     * ساخت Dots نئونی.
+     *  - صفحه فعلی: مستطیل با دو سر گرد (پهن‌تر)
+     *  - بقیه: دایره پر
+     *  - رنگ: onb.txt با افکت درخشان (نئون/شیشه‌ای)
+     */
+    private fun buildDots(txtColor: String, current: Int) {
+        dotsContainer.removeAllViews()
 
-        val next = if (config.welcome.active) {
-            WelcomeActivity::class.java
-        } else {
-            WebActivity::class.java
+        val baseColor = SvgHelper.parseColor(txtColor)
+        val glowColor = withAlpha(baseColor, 0.45f)   // هاله نئونی
+        val dotColor  = withAlpha(baseColor, 0.95f)   // رنگ خود نقطه
+
+        val dotSize   = SvgHelper.dp(this, 8)
+        val activeW   = SvgHelper.dp(this, 26)
+        val activeH   = SvgHelper.dp(this, 8)
+        val gap       = SvgHelper.dp(this, 8)
+
+        for (i in 0 until totalPages) {
+            val isActive = i == current
+
+            // کانتینر هر نقطه — برای داشتن افکت glow با padding
+            val wrap = FrameLayout(this).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    if (isActive) activeW else dotSize,
+                    if (isActive) activeH else dotSize
+                ).apply {
+                    marginStart = if (i == 0) 0 else gap
+                }
+            }
+
+            // خود نقطه
+            val shape = GradientDrawable().apply {
+                shape = GradientDrawable.RECTANGLE
+                cornerRadius = if (isActive) activeH / 2f else dotSize / 2f
+                setColor(dotColor)
+            }
+
+            val dot = View(this).apply {
+                layoutParams = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT
+                )
+                background = shape
+                elevation = SvgHelper.dp(this@OnboardingActivity, 6).toFloat()
+                // سایه نئونی هم‌رنگ متن
+                outlineSpotShadowColor = glowColor
+                outlineAmbientShadowColor = glowColor
+            }
+
+            wrap.addView(dot)
+
+            // هاله نئونی (لایه زیرین — کمی پهن‌تر و شفاف)
+            val glow = View(this).apply {
+                layoutParams = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT
+                ).apply {
+                    leftMargin = -SvgHelper.dp(this@OnboardingActivity, 3)
+                    rightMargin = -SvgHelper.dp(this@OnboardingActivity, 3)
+                    topMargin = -SvgHelper.dp(this@OnboardingActivity, 3)
+                    bottomMargin = -SvgHelper.dp(this@OnboardingActivity, 3)
+                }
+                background = GradientDrawable().apply {
+                    shape = GradientDrawable.RECTANGLE
+                    cornerRadius = if (isActive) (activeH + 6) / 2f
+                                   else (dotSize + 6) / 2f
+                    setColor(if (isActive) glowColor else withAlpha(baseColor, 0.15f))
+                }
+                alpha = if (isActive) 0.85f else 0.4f
+            }
+
+            // ترتیب: اول glow، بعد dot
+            wrap.addView(glow, 0)
+
+            dotsContainer.addView(wrap)
         }
-        startActivity(Intent(this, next))
-        finish()
+    }
+
+    /**
+     * افزودن آلفا به رنگ.
+     */
+    private fun withAlpha(color: Int, alpha: Float): Int {
+        val a = (alpha.coerceIn(0f, 1f) * 255).toInt()
+        return Color.argb(
+            a,
+            Color.red(color),
+            Color.green(color),
+            Color.blue(color)
+        )
     }
 
     private fun loadFont(): Typeface? = try {
@@ -157,7 +238,6 @@ class OnboardingActivity : AppCompatActivity() {
             val page = pages[position]
             val ctx = holder.itemView.context
 
-            // پاک کردن قبلی
             holder.boxTop.removeAllViews()
             holder.boxCenter.removeAllViews()
             holder.boxBottom.removeAllViews()
@@ -174,12 +254,11 @@ class OnboardingActivity : AppCompatActivity() {
                 pickBox(holder, page.iconPos).addView(holderBox)
             }
 
-            // --- متن (عنوان + زیرمتن با هم) ---
+            // --- متن ---
             if (page.textPos != "hidden") {
                 val textBox = LinearLayout(ctx).apply {
                     orientation = LinearLayout.VERTICAL
                     gravity = Gravity.CENTER
-                    setPadding(0, SvgHelper.dp(ctx, 16), 0, 0)
                 }
 
                 val tvTitle = TextView(ctx).apply {
@@ -227,7 +306,5 @@ class OnboardingActivity : AppCompatActivity() {
 
     companion object {
         private const val PAD = 24
-        private const val BTN_TEXT = "بعدی"
-        private const val PREFS = "app_prefs"
     }
 }
