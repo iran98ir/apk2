@@ -1,20 +1,24 @@
 package ir.apkbuilder
 
 import android.content.Intent
-import android.graphics.Color
 import android.graphics.Typeface
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.Gravity
 import android.widget.FrameLayout
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 
 /**
- * Splash: پس‌زمینه از json + آیکون SVG اختیاری + عنوان اختیاری.
- * بعد از ۲ ثانیه → Onboarding (اگه فعال) یا Welcome.
+ * صفحه اسپلش.
+ *
+ * قانون:
+ *  - پس‌زمینه از splash.bgMode/bg/bg2/bgAngle
+ *  - آیکون از splash.hasIcon/iconSvg/iconSize/...
+ *  - متن از splash.hasText/title/tSize/txt
+ *  - محل قرارگیری از splash.iconPos / splash.textPos
+ *  - اگه مقدار "hidden" بود → همون عنصر مخفی میشه
  */
 class SplashActivity : AppCompatActivity() {
 
@@ -24,90 +28,97 @@ class SplashActivity : AppCompatActivity() {
         val config = ConfigLoader.load(this)
         val sp = config.splash
 
-        // ریشه: FrameLayout با پس‌زمینه
         val root = FrameLayout(this)
         root.background = SvgHelper.makeBackground(sp.bgMode, sp.bg, sp.bg2, sp.bgAngle)
 
-        // ستون مرکزی عمودی
-        val col = LinearLayout(this)
-        col.orientation = LinearLayout.VERTICAL
-        col.gravity = Gravity.CENTER
-        val colLp = FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.MATCH_PARENT,
-            FrameLayout.LayoutParams.MATCH_PARENT
-        )
-        col.layoutParams = colLp
-        root.addView(col)
-
-        // آیکون (اگه تعریف شده)
-        if (sp.hasIcon && !sp.iconSvg.isNullOrBlank()) {
-            val iconHolder = FrameLayout(this)
-            val holderSize = SvgHelper.dp(this, sp.iconBoxSize)
-            val holderLp = LinearLayout.LayoutParams(holderSize, holderSize)
-            holderLp.gravity = Gravity.CENTER_HORIZONTAL
-            iconHolder.layoutParams = holderLp
-            SvgHelper.buildIconView(
-                this,
-                iconHolder,
-                sp.iconSvg,
-                sp.iconSize,
-                sp.iconBoxSize,
-                sp.iconBgOn,
-                sp.iconBg,
-                sp.iconShape,
-                sp.iconColorOn,
-                sp.iconColor
+        val col = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
             )
-            // فاصله زیرش
-            val wrap = LinearLayout.LayoutParams(holderSize, holderSize)
-            wrap.gravity = Gravity.CENTER_HORIZONTAL
-            wrap.bottomMargin = SvgHelper.dp(this, 16)
-
-            // چون buildIconView قبلاً box رو به parent اضافه کرده،
-            // برای سادگی اینجا holder رو مستقیم اضافه می‌کنیم
-            col.addView(iconHolder, wrap)
+            setPadding(
+                SvgHelper.dp(this@SplashActivity, PAD),
+                SvgHelper.dp(this@SplashActivity, PAD),
+                SvgHelper.dp(this@SplashActivity, PAD),
+                SvgHelper.dp(this@SplashActivity, PAD)
+            )
         }
 
-        // متن (اگه تعریف شده)
-        if (sp.hasText && sp.title.isNotBlank()) {
-            val tv = TextView(this)
-            tv.text = sp.title
-            tv.setTextColor(SvgHelper.parseColor(sp.txt))
-            tv.textSize = sp.tSize.toFloat()
-            tv.gravity = Gravity.CENTER
-            tv.typeface = loadFont()
-            col.addView(tv)
+        // --- آیکون ---
+        if (sp.hasIcon && sp.iconPos != "hidden") {
+            val holder = FrameLayout(this)
+            holder.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            SvgHelper.buildIconView(
+                this, holder,
+                sp.iconSvg, sp.iconSize, sp.iconBoxSize,
+                sp.iconBgOn, sp.iconBg, sp.iconShape,
+                sp.iconColorOn, sp.iconColor
+            )
+            addToColumn(col, holder, sp.iconPos)
         }
 
+        // --- متن ---
+        if (sp.hasText && sp.textPos != "hidden") {
+            val tv = TextView(this).apply {
+                text = sp.title
+                textSize = sp.tSize.toFloat()
+                setTextColor(SvgHelper.parseColor(sp.txt))
+                gravity = Gravity.CENTER
+                typeface = loadFont()
+            }
+            addToColumn(col, tv, sp.textPos)
+        }
+
+        root.addView(col)
         setContentView(root)
 
-        // رنگ نوارها
         ThemeHelper.applySystemBars(this, config)
 
-        // بعد از ۲ ثانیه برو مرحله بعد
-        root.postDelayed({
-            val next = when {
-                config.onb.active && config.onb.pages.isNotEmpty() &&
-                        shouldShowOnboarding(config) -> OnboardingActivity::class.java
-                config.welcome.active -> WelcomeActivity::class.java
-                else -> WebActivity::class.java
-            }
-            startActivity(Intent(this, next))
-            finish()
-        }, 2000)
+        root.postDelayed({ goNext(config) }, SPLASH_DELAY)
     }
 
-    private fun shouldShowOnboarding(config: AppConfig): Boolean {
-        if (!config.onb.firstRunOnly) return true
-        val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
-        return !prefs.getBoolean("onb_shown", false)
-    }
-
-    private fun loadFont(): Typeface? {
-        return try {
-            androidx.core.content.res.ResourcesCompat.getFont(this, R.font.lalezar)
-        } catch (e: Exception) {
-            null
+    private fun addToColumn(col: LinearLayout, view: android.view.View, pos: String) {
+        // ترتیب: بالا، وسط، پایین
+        // از LinearLayout با weight استفاده نمی‌کنیم؛ به جاش سه باکس می‌سازیم
+        when (pos) {
+            "top"    -> col.addView(view, 0)
+            "center" -> col.addView(view)
+            "bottom" -> col.addView(view)
         }
+    }
+
+    private fun goNext(config: AppConfig) {
+        val prefs = getSharedPreferences(PREFS, MODE_PRIVATE)
+
+        val showOnb = config.onb.active &&
+                config.onb.pages.isNotEmpty() &&
+                (!config.onb.firstRunOnly || !prefs.getBoolean(KEY_ONB, false))
+
+        val next = when {
+            showOnb            -> OnboardingActivity::class.java
+            config.welcome.active -> WelcomeActivity::class.java
+            else               -> WebActivity::class.java
+        }
+
+        startActivity(Intent(this, next))
+        finish()
+    }
+
+    private fun loadFont(): Typeface? = try {
+        ResourcesCompat.getFont(this, R.font.lalezar)
+    } catch (e: Exception) {
+        null
+    }
+
+    companion object {
+        private const val PAD = 24
+        private const val SPLASH_DELAY = 2000L
+        private const val PREFS = "app_prefs"
+        const val KEY_ONB = "onb_shown"
     }
 }
