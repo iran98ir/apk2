@@ -5,7 +5,9 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
+import android.os.Message
 import android.webkit.CookieManager
+import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
@@ -57,6 +59,10 @@ class WebActivity : AppCompatActivity() {
         settings.displayZoomControls = false
         settings.cacheMode = WebSettings.LOAD_DEFAULT
         settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+
+        // --- پشتیبانی از پنجره جدید (target="_blank") ---
+        settings.setSupportMultipleWindows(true)
+        settings.javaScriptCanOpenWindowsAutomatically = true
 
         // --- کوکی‌ها بر اساس keepSession ---
         if (web.keepSession) {
@@ -126,6 +132,56 @@ class WebActivity : AppCompatActivity() {
                 if (request.isForMainFrame) {
                     gotoError(mapErrorCode(error.errorCode))
                 }
+            }
+        }
+
+        // --- WebChromeClient — پشتیبانی از پنجره جدید ---
+        webView.webChromeClient = object : WebChromeClient() {
+            override fun onCreateWindow(
+                view: WebView,
+                isDialog: Boolean,
+                isUserGesture: Boolean,
+                resultMsg: Message
+            ): Boolean {
+                // WebView موقت برای گرفتن URL پنجره جدید
+                val tempWebView = WebView(this@WebActivity)
+                tempWebView.webViewClient = object : WebViewClient() {
+                    override fun shouldOverrideUrlLoading(
+                        v: WebView,
+                        request: WebResourceRequest
+                    ): Boolean {
+                        val url = request.url.toString()
+
+                        // browserOnly — تطابق ۱۰۰٪ عیناً → مرورگر
+                        if (matchesBrowserOnly(url, web.browserOnly)) {
+                            try {
+                                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                            } catch (e: Exception) {
+                                // بی‌خیال
+                            }
+                            return true
+                        }
+
+                        // extLink — دامنه خارجی → مرورگر
+                        if (web.extLink && !isSameDomain(url, web.url)) {
+                            try {
+                                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                            } catch (e: Exception) {
+                                // بی‌خیال
+                            }
+                            return true
+                        }
+
+                        // بقیه → تو همون WebView اصلی باز کن
+                        webView.loadUrl(url)
+                        return true
+                    }
+                }
+
+                val transport = resultMsg.obj as WebView.WebViewTransport
+                transport.webView = tempWebView
+                resultMsg.sendToTarget()
+                return true
             }
         }
 
