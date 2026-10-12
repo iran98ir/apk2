@@ -5,9 +5,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
-import android.os.Message
 import android.webkit.CookieManager
-import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
@@ -24,11 +22,8 @@ import androidx.appcompat.app.AppCompatActivity
  *  - keepSession از web.keepSession → کوکی‌ها
  *  - extLink از web.extLink → لینک‌های خارجی توی مرورگر
  *  - deepLink از web.deepLink → اسکیم‌های غیر http
- *  - browserOnly از web.browserOnly → لیست دامنه‌هایی که همیشه توی مرورگر باز شن
+ *  - browserOnly از web.browserOnly → لیست لینک‌هایی که دقیقاً (۱۰۰٪ عیناً) توی مرورگر باز شن
  *  - خطاها بر اساس کد WebView → یکی از کلیدهای error.items
- *
- * تغییر جدید:
- *  - target="_blank" و پنجره‌های جدید توی همون WebView باز می‌شن
  */
 class WebActivity : AppCompatActivity() {
 
@@ -63,10 +58,6 @@ class WebActivity : AppCompatActivity() {
         settings.cacheMode = WebSettings.LOAD_DEFAULT
         settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
 
-        // مهم برای دکمه‌های ورود که پنجره جدید باز می‌کنن (target="_blank")
-        settings.javaScriptCanOpenWindowsAutomatically = true
-        settings.setSupportMultipleWindows(true)
-
         // --- کوکی‌ها بر اساس keepSession ---
         if (web.keepSession) {
             CookieManager.getInstance().setAcceptCookie(true)
@@ -99,7 +90,7 @@ class WebActivity : AppCompatActivity() {
                     return true
                 }
 
-                // browserOnly — لیست دامنه‌ها که همیشه توی مرورگر باز شن
+                // browserOnly — فقط تطابق ۱۰۰٪ عیناً
                 if (matchesBrowserOnly(url, web.browserOnly)) {
                     return try {
                         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
@@ -138,43 +129,6 @@ class WebActivity : AppCompatActivity() {
             }
         }
 
-        // --- WebChromeClient — برای target="_blank" و پنجره‌های جدید ---
-        webView.webChromeClient = object : WebChromeClient() {
-
-            override fun onCreateWindow(
-                view: WebView,
-                isDialog: Boolean,
-                isUserGesture: Boolean,
-                resultMsg: Message
-            ): Boolean {
-                // پنجره جدید رو توی همون WebView اصلی باز کن
-                val newWebView = WebView(view.context)
-                newWebView.settings.apply {
-                    javaScriptEnabled = true
-                    domStorageEnabled = true
-                    setSupportMultipleWindows(true)
-                    javaScriptCanOpenWindowsAutomatically = true
-                }
-
-                val transport = resultMsg.obj as WebView.WebViewTransport
-                transport.webView = newWebView
-                resultMsg.sendToTarget()
-
-                // URL پنجره جدید رو توی WebView اصلی لود کن
-                newWebView.webViewClient = object : WebViewClient() {
-                    override fun shouldOverrideUrlLoading(
-                        view: WebView,
-                        request: WebResourceRequest
-                    ): Boolean {
-                        webView.loadUrl(request.url.toString())
-                        return true
-                    }
-                }
-
-                return true
-            }
-        }
-
         root.addView(webView)
         setContentView(root)
 
@@ -184,20 +138,18 @@ class WebActivity : AppCompatActivity() {
     }
 
     /**
-     * آیا url توی لیست browserOnly هست؟
-     * لیست با کاما جدا شده، مثل: "zarinpal.com, telegram.org"
+     * آیا url دقیقاً (۱۰۰٪ عیناً) با یکی از لینک‌های browserOnly یکی هست؟
+     * لیست با کاما جدا شده، مثل: "https://rosha-24.ir/x7q, https://google.com"
+     *
+     * تطابق: url == pattern (نه contains، نه startsWith، نه بر اساس دامنه)
      */
     private fun matchesBrowserOnly(url: String, browserOnly: String): Boolean {
         if (browserOnly.isBlank()) return false
-        val host = try {
-            Uri.parse(url).host ?: return false
-        } catch (e: Exception) {
-            return false
-        }
+
         return browserOnly.split(",")
             .map { it.trim() }
             .filter { it.isNotEmpty() }
-            .any { host == it || host.endsWith(".$it") }
+            .any { pattern -> url == pattern }
     }
 
     /**
