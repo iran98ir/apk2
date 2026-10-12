@@ -121,11 +121,11 @@
     },
     "web": {
         "url": "https://rosha-24.ir/app/app1/",
-        "extLink": true,
+        "extLink": false,
         "deepLink": true,
         "deepLinkUrl": "https://rosha-24.ir/app/app1/",
-        "keepSession": false,
-        "browserOnly": "https://rosha-24.ir/x7q"
+        "keepSession": true,
+        "browserOnly": "https://rosha-24.ir/x7q/"
     },
     "exit": {
         "active": false,
