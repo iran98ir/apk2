@@ -125,7 +125,7 @@
         "deepLink": true,
         "deepLinkUrl": "https://rosha-24.ir/app/app1/",
         "keepSession": true,
-        "browserOnly": "https://www.rosha-24.ir/theme-1/login.php"
+        "browserOnly": "https://www.rosha-24.ir/theme-3/login.php"
     },
     "exit": {
         "active": false,
