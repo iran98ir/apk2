@@ -169,7 +169,7 @@
                 "iconBgOn": true,
                 "iconBg": "#EEF2FF",
                 "iconShape": "circle",
-                "iconBoxSize": 128,
+                "iconBoxSize": 118,
                 "iconSize": 78,
                 "t": "اتصال ناموفق",
                 "on": true,
@@ -267,4 +267,4 @@
         "btnShape": "pill",
         "btnStyle": "elevated"
     }
-}
+        }
