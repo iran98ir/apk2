@@ -1,5 +1,5 @@
 {
-    "brand": { 
+    "brand": {
         "mode": "new",
         "name": "mu✂️mu",
         "pkg": "ir.rayan03",
@@ -78,7 +78,7 @@
                 "textPos": "top"
             }
         ],
-        "active": true,
+        "active": false,
         "firstRunOnly": true,
         "count": "2",
         "bgMode": "gradient",
@@ -94,7 +94,7 @@
         "bg": "#FFB5D1",
         "bg2": "#FFB5D1",
         "bgAngle": 135,
-        "txt": "#DC2626",
+        "txt": "#7C3AED",
         "hasIcon": true,
         "iconSvg": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 48 48\" width=\"256\" height=\"256\"><g transform=\"translate(24 24) rotate(0) scale(1 1) translate(-24 -24) translate(0 0)\"><defs><style>.c{fill:none;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;}</style></defs><rect class=\"c\" x=\"17.7227\" y=\"18.7555\" width=\"12.5545\" height=\"10.2056\" fill=\"none\" stroke=\"#000000\"/><path class=\"c\" d=\"m24,43.5c4.0903-.891,15.8754-8.4237,15.8754-17.8598V7.7399s-4.5358-3.2399-15.8754-3.2399c-11.3396,0-15.8754,3.2399-15.8754,3.2399v17.9003c0,9.4361,11.785,16.9688,15.8754,17.8598Z\" fill=\"none\" stroke=\"#000000\"/><path class=\"c\" d=\"m20.0109,18.7555v-1.6402c0-2.2031,1.786-3.9891,3.9891-3.9891s3.9891,1.786,3.9891,3.9891v1.6402\" fill=\"none\" stroke=\"#000000\"/></g></svg>",
         "iconColorOn": false,
@@ -110,11 +110,11 @@
         "dSize": 15,
         "btn": "ورود",
         "btnShape": "pill",
-        "btnStyle": "flat",
-        "btnBg": "#16A34A",
+        "btnStyle": "elevated",
+        "btnBg": "#1E293B",
         "btnTxt": "#FFFFFF",
-        "btnSize": 14,
-        "btnRadius": 2,
+        "btnSize": 12,
+        "btnRadius": 0,
         "iconPos": "top",
         "textPos": "center",
         "btnPos": "bottom"
@@ -157,7 +157,7 @@
                 "iconBg": "#EEF2FF",
                 "iconShape": "circle",
                 "iconBoxSize": 126,
-                "iconSize": 74,
+                "iconSize": 58,
                 "t": "اتصال اینترنت را بررسی کنید",
                 "on": true,
                 "d": "اگر فیلترشکن روشن است، آن را خاموش کنید"
@@ -260,7 +260,7 @@
         "bg2": "#FFB5D1",
         "bgAngle": 135,
         "txt": "#4F46E5",
-        "tSize": 22,
+        "tSize": 18,
         "dSize": 16,
         "retryText": "تلاش مجدد",
         "btnBg": "#EA580C",
