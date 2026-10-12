@@ -1,13 +1,11 @@
 package ir.apkbuilder
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
-import android.graphics.drawable.StateListDrawable
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -19,382 +17,416 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import android.widget.Button
 
 /**
- * صفحه Welcome
+ * =========================================================
+ * WelcomeActivity
  *
- * تمام اطلاعات ظاهری و محتوایی از welcome در app.json می‌آید.
+ * Native Premium Welcome Renderer
  *
- * قانون:
- *  - پس‌زمینه از welcome.bgMode / bg / bg2 / bgAngle
- *  - آیکون از welcome.hasIcon / iconSvg / ...
- *  - متن از welcome.t / welcome.d / ...
- *  - دکمه از welcome.btn / btnShape / btnStyle / ...
- *  - محل عناصر از welcome.iconPos / textPos / btnPos
- *  - مقدار "hidden" → عنصر ساخته نمی‌شود
+ * قانون اصلی:
  *
- * این فایل فقط Renderer و رفتار Native است.
- * هیچ محتوای مخصوص یک اپ در این فایل Hardcode نشده است.
+ * هیچ محتوای اختصاصی یک اپ در این فایل وجود ندارد.
+ *
+ * تمام اطلاعات Welcome از:
+ *
+ *     ConfigLoader
+ *          ↓
+ *     AppConfig
+ *          ↓
+ *     config.welcome
+ *          ↓
+ *     app.json
+ *
+ * خوانده می‌شود.
+ *
+ * این فایل فقط:
+ * - Renderer
+ * - Layout Engine
+ * - Animation Engine
+ *
+ * است.
+ * =========================================================
  */
 class WelcomeActivity : AppCompatActivity() {
 
+    private lateinit var config: AppConfig
     private lateinit var root: FrameLayout
+    private lateinit var content: LinearLayout
 
-    private val enterInterpolator = DecelerateInterpolator(1.45f)
-    private val buttonInterpolator = OvershootInterpolator(1.15f)
+    private var isLeaving = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val config = ConfigLoader.load(this)
-        val w = config.welcome
+        /*
+         * =====================================================
+         * LOAD CONFIG
+         * =====================================================
+         */
+
+        config = ConfigLoader.load(this)
+
+        val welcome = config.welcome
 
         /*
-         * Root
+         * =====================================================
+         * ROOT
+         * =====================================================
          */
+
         root = FrameLayout(this).apply {
-            background = SvgHelper.makeBackground(
-                w.bgMode,
-                w.bg,
-                w.bg2,
-                w.bgAngle
-            )
-
-            alpha = 0f
-        }
-
-        /*
-         * محتوای اصلی
-         */
-        val col = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            gravity = Gravity.CENTER
 
             layoutParams = FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT
             )
 
-            setPadding(
-                SvgHelper.dp(this@WelcomeActivity, PAD),
-                SvgHelper.dp(this@WelcomeActivity, PAD),
-                SvgHelper.dp(this@WelcomeActivity, PAD),
-                SvgHelper.dp(this@WelcomeActivity, PAD)
+            /*
+             * کاملاً از app.json
+             */
+            background = SvgHelper.makeBackground(
+                welcome.bgMode,
+                welcome.bg,
+                welcome.bg2,
+                welcome.bgAngle
             )
+
+            /*
+             * برای ورود نرم صفحه
+             */
+            alpha = 0f
+
+            clipChildren = false
+            clipToPadding = false
         }
 
         /*
-         * سه ناحیه اصلی
-         *
-         * top
-         * center
-         * bottom
-         *
-         * این ساختار با سیستم فعلی app.json حفظ شده.
+         * =====================================================
+         * MAIN CONTENT
+         * =====================================================
          */
-        val boxTop = makeBox()
-        val boxCenter = makeBox()
-        val boxBottom = makeBox()
 
-        col.addView(boxTop)
-        col.addView(boxCenter)
-        col.addView(boxBottom)
+        content = LinearLayout(this).apply {
+
+            orientation = LinearLayout.VERTICAL
+
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            )
+
+            gravity = Gravity.CENTER
+
+            setPadding(
+                SvgHelper.dp(
+                    this@WelcomeActivity,
+                    CONTENT_PADDING
+                ),
+                SvgHelper.dp(
+                    this@WelcomeActivity,
+                    CONTENT_PADDING
+                ),
+                SvgHelper.dp(
+                    this@WelcomeActivity,
+                    CONTENT_PADDING
+                ),
+                SvgHelper.dp(
+                    this@WelcomeActivity,
+                    CONTENT_PADDING
+                )
+            )
+
+            clipChildren = false
+            clipToPadding = false
+        }
 
         /*
-         * برای انیمیشن ورود،
-         * Viewهایی که واقعاً ساخته می‌شوند را نگه می‌داریم.
+         * =====================================================
+         * THREE REAL AREAS
+         *
+         * TOP
+         * CENTER
+         * BOTTOM
+         *
+         * موقعیت عناصر از JSON تعیین می‌شود.
+         * =====================================================
          */
-        val animatedViews = ArrayList<View>()
 
-        // ============================================================
-        // ICON
-        // ============================================================
+        val topBox = makeBox()
+        val centerBox = makeBox()
+        val bottomBox = makeBox()
+
+        content.addView(topBox)
+        content.addView(centerBox)
+        content.addView(bottomBox)
+
+        root.addView(content)
+
+        /*
+         * =====================================================
+         * ICON
+         * =====================================================
+         */
+
+        var iconView: View? = null
 
         if (
-            w.hasIcon &&
-            w.iconPos != "hidden" &&
-            w.iconSvg.isNotBlank()
+            welcome.hasIcon &&
+            welcome.iconPos != "hidden" &&
+            welcome.iconSvg.isNotBlank()
         ) {
-            val holder = FrameLayout(this).apply {
-                alpha = 0f
-                scaleX = 0.88f
-                scaleY = 0.88f
-                translationY = SvgHelper.dp(
-                    this@WelcomeActivity,
-                    14
-                ).toFloat()
 
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                ).apply {
-                    gravity = Gravity.CENTER
-                }
+            val iconHolder = FrameLayout(this).apply {
+
+                layoutParams =
+                    LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    ).apply {
+
+                        gravity = Gravity.CENTER
+                    }
+
+                /*
+                 * شروع Animation
+                 */
+                alpha = 0f
+
+                scaleX = ICON_START_SCALE
+                scaleY = ICON_START_SCALE
+
+                translationY =
+                    SvgHelper.dp(
+                        this@WelcomeActivity,
+                        ICON_START_Y
+                    ).toFloat()
             }
 
+            /*
+             * تمام تنظیمات آیکون از JSON
+             */
             SvgHelper.buildIconView(
                 this,
-                holder,
-                w.iconSvg,
-                w.iconSize,
-                w.iconBoxSize,
-                w.iconBgOn,
-                w.iconBg,
-                w.iconShape,
-                w.iconColorOn,
-                w.iconColor
+                iconHolder,
+                welcome.iconSvg,
+                welcome.iconSize,
+                welcome.iconBoxSize,
+                welcome.iconBgOn,
+                welcome.iconBg,
+                welcome.iconShape,
+                welcome.iconColorOn,
+                welcome.iconColor
             )
 
             pickBox(
-                boxTop,
-                boxCenter,
-                boxBottom,
-                w.iconPos
-            ).addView(holder)
+                topBox,
+                centerBox,
+                bottomBox,
+                welcome.iconPos
+            ).addView(iconHolder)
 
-            animatedViews.add(holder)
+            iconView = iconHolder
         }
-
-        // ============================================================
-        // TEXT
-        // ============================================================
-
-        if (w.textPos != "hidden") {
-
-            val textBox = LinearLayout(this).apply {
-                orientation = LinearLayout.VERTICAL
-                gravity = Gravity.CENTER
-
-                alpha = 0f
-                translationY = SvgHelper.dp(
-                    this@WelcomeActivity,
-                    18
-                ).toFloat()
-
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                ).apply {
-                    gravity = Gravity.CENTER
-                }
-            }
-
-            /*
-             * عنوان
-             */
-            val tvTitle = TextView(this).apply {
-                text = w.t
-                textSize = w.tSize.toFloat()
-                setTextColor(SvgHelper.parseColor(w.txt))
-                gravity = Gravity.CENTER
-                typeface = loadFont()
-
-                includeFontPadding = true
-
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                )
-
-                setLineSpacing(
-                    0f,
-                    1.05f
-                )
-            }
-
-            textBox.addView(tvTitle)
-
-            /*
-             * توضیح
-             */
-            val tvDesc = TextView(this).apply {
-                text = w.d
-                textSize = w.dSize.toFloat()
-                setTextColor(SvgHelper.parseColor(w.txt))
-                gravity = Gravity.CENTER
-                typeface = loadFont()
-
-                includeFontPadding = true
-
-                setPadding(
-                    0,
-                    SvgHelper.dp(this@WelcomeActivity, 8),
-                    0,
-                    0
-                )
-
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                )
-
-                setLineSpacing(
-                    0f,
-                    1.12f
-                )
-            }
-
-            textBox.addView(tvDesc)
-
-            pickBox(
-                boxTop,
-                boxCenter,
-                boxBottom,
-                w.textPos
-            ).addView(textBox)
-
-            animatedViews.add(textBox)
-        }
-
-        // ============================================================
-        // BUTTON
-        // ============================================================
-
-        if (w.btnPos != "hidden") {
-
-            val buttonHolder = FrameLayout(this).apply {
-                alpha = 0f
-                translationY = SvgHelper.dp(
-                    this@WelcomeActivity,
-                    20
-                ).toFloat()
-
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                ).apply {
-                    gravity = Gravity.CENTER
-
-                    topMargin = SvgHelper.dp(
-                        this@WelcomeActivity,
-                        8
-                    )
-                }
-            }
-
-            val btn = Button(this).apply {
-
-                text = w.btn
-
-                textSize = w.btnSize.toFloat()
-
-                setTextColor(
-                    SvgHelper.parseColor(w.btnTxt)
-                )
-
-                typeface = loadFont()
-
-                isAllCaps = false
-
-                /*
-                 * حذف padding و background پیش‌فرض Button
-                 * تا ظاهر Native قدیمی اندروید وارد UI نشود.
-                 */
-                stateListAnimator = null
-
-                background = buildButtonBackground(w)
-
-                setPadding(
-                    SvgHelper.dp(this@WelcomeActivity, 32),
-                    SvgHelper.dp(this@WelcomeActivity, 14),
-                    SvgHelper.dp(this@WelcomeActivity, 32),
-                    SvgHelper.dp(this@WelcomeActivity, 14)
-                )
-
-                minHeight = 0
-                minimumHeight = 0
-
-                includeFontPadding = true
-
-                gravity = Gravity.CENTER
-
-                /*
-                 * اندازه محتوا بر اساس متن و تنظیمات فعلی.
-                 */
-                layoutParams = FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.WRAP_CONTENT,
-                    FrameLayout.LayoutParams.WRAP_CONTENT
-                )
-
-                /*
-                 * Ripple / Press feedback
-                 */
-                ViewCompat.setElevation(
-                    this,
-                    SvgHelper.dp(
-                        this@WelcomeActivity,
-                        3
-                    ).toFloat()
-                )
-
-                /*
-                 * لمس حرفه‌ای:
-                 * هنگام لمس کمی کوچک می‌شود و بعد برمی‌گردد.
-                 */
-                setOnTouchListener { view, event ->
-
-                    when (event.actionMasked) {
-
-                        android.view.MotionEvent.ACTION_DOWN -> {
-                            view.animate()
-                                .scaleX(0.965f)
-                                .scaleY(0.965f)
-                                .setDuration(90L)
-                                .setInterpolator(DecelerateInterpolator())
-                                .start()
-                        }
-
-                        android.view.MotionEvent.ACTION_UP -> {
-                            view.animate()
-                                .scaleX(1f)
-                                .scaleY(1f)
-                                .setDuration(180L)
-                                .setInterpolator(buttonInterpolator)
-                                .start()
-                        }
-
-                        android.view.MotionEvent.ACTION_CANCEL -> {
-                            view.animate()
-                                .scaleX(1f)
-                                .scaleY(1f)
-                                .setDuration(140L)
-                                .setInterpolator(DecelerateInterpolator())
-                                .start()
-                        }
-                    }
-
-                    false
-                }
-
-                setOnClickListener {
-                    openWebActivity()
-                }
-            }
-
-            buttonHolder.addView(btn)
-
-            pickBox(
-                boxTop,
-                boxCenter,
-                boxBottom,
-                w.btnPos
-            ).addView(buttonHolder)
-
-            animatedViews.add(buttonHolder)
-        }
-
-        root.addView(col)
-
-        setContentView(root)
 
         /*
-         * جلوگیری از چسبیدن UI به system bars
-         * بدون تغییر ساختار app.json.
+         * =====================================================
+         * TEXT
+         * =====================================================
          */
-        applySafeInsets(col)
+
+        var textView: View? = null
+
+        if (
+            welcome.textPos != "hidden" &&
+            (
+                welcome.t.isNotBlank() ||
+                    welcome.d.isNotBlank()
+                )
+        ) {
+
+            val textBox =
+                LinearLayout(this).apply {
+
+                    orientation =
+                        LinearLayout.VERTICAL
+
+                    gravity =
+                        Gravity.CENTER
+
+                    layoutParams =
+                        LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        )
+                }
+
+            /*
+             * TITLE
+             */
+            if (welcome.t.isNotBlank()) {
+
+                val title =
+                    TextView(this).apply {
+
+                        text = welcome.t
+
+                        textSize =
+                            welcome.tSize.toFloat()
+
+                        setTextColor(
+                            SvgHelper.parseColor(
+                                welcome.txt
+                            )
+                        )
+
+                        gravity = Gravity.CENTER
+
+                        typeface = loadFont()
+
+                        includeFontPadding = true
+
+                        setLineSpacing(
+                            0f,
+                            TITLE_LINE_SPACING
+                        )
+
+                        alpha = 0f
+
+                        translationY =
+                            SvgHelper.dp(
+                                this@WelcomeActivity,
+                                TEXT_START_Y
+                            ).toFloat()
+
+                        layoutParams =
+                            LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT
+                            )
+                    }
+
+                textBox.addView(title)
+
+                textView = title
+            }
+
+            /*
+             * DESCRIPTION
+             */
+            if (welcome.d.isNotBlank()) {
+
+                val description =
+                    TextView(this).apply {
+
+                        text = welcome.d
+
+                        textSize =
+                            welcome.dSize.toFloat()
+
+                        setTextColor(
+                            SvgHelper.parseColor(
+                                welcome.txt
+                            )
+                        )
+
+                        gravity = Gravity.CENTER
+
+                        typeface = loadFont()
+
+                        includeFontPadding = true
+
+                        setPadding(
+                            0,
+                            SvgHelper.dp(
+                                this@WelcomeActivity,
+                                DESCRIPTION_TOP_PADDING
+                            ),
+                            0,
+                            0
+                        )
+
+                        setLineSpacing(
+                            0f,
+                            DESCRIPTION_LINE_SPACING
+                        )
+
+                        alpha = 0f
+
+                        translationY =
+                            SvgHelper.dp(
+                                this@WelcomeActivity,
+                                TEXT_START_Y
+                            ).toFloat()
+
+                        layoutParams =
+                            LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT
+                            )
+                    }
+
+                textBox.addView(description)
+
+                if (textView == null) {
+                    textView = description
+                }
+            }
+
+            pickBox(
+                topBox,
+                centerBox,
+                bottomBox,
+                welcome.textPos
+            ).addView(textBox)
+        }
+
+        /*
+         * =====================================================
+         * BUTTON
+         * =====================================================
+         */
+
+        var buttonView: TextView? = null
+
+        if (
+            welcome.btn.isNotBlank() &&
+            welcome.btnPos != "hidden"
+        ) {
+
+            buttonView =
+                buildButton(welcome).apply {
+
+                    /*
+                     * Animation
+                     */
+                    alpha = 0f
+
+                    scaleX = BUTTON_START_SCALE
+                    scaleY = BUTTON_START_SCALE
+
+                    translationY =
+                        SvgHelper.dp(
+                            this@WelcomeActivity,
+                            BUTTON_START_Y
+                        ).toFloat()
+                }
+
+            pickBox(
+                topBox,
+                centerBox,
+                bottomBox,
+                welcome.btnPos
+            ).addView(buttonView)
+        }
+
+        /*
+         * =====================================================
+         * SET CONTENT
+         * =====================================================
+         */
+
+        setContentView(root)
 
         ThemeHelper.applySystemBars(
             this,
@@ -402,356 +434,629 @@ class WelcomeActivity : AppCompatActivity() {
         )
 
         /*
-         * شروع انیمیشن ورود
+         * =====================================================
+         * START ENTRANCE
+         *
+         * بعد از setContentView
+         * تا هیچ Animation روی View جداشده اجرا نشود.
+         * =====================================================
          */
+
         root.post {
-            playEntranceAnimation(animatedViews)
-        }
-    }
 
-    // ================================================================
-    // ENTRANCE ANIMATION
-    // ================================================================
+            playRootEntrance()
 
-    private fun playEntranceAnimation(
-        views: List<View>
-    ) {
-        if (views.isEmpty()) {
-            root.animate()
-                .alpha(1f)
-                .setDuration(260L)
-                .setInterpolator(enterInterpolator)
-                .start()
-
-            return
-        }
-
-        /*
-         * اول خود صفحه آرام ظاهر می‌شود.
-         */
-        root.animate()
-            .alpha(1f)
-            .setDuration(260L)
-            .setInterpolator(enterInterpolator)
-            .start()
-
-        /*
-         * هر عنصر با فاصله بسیار کم وارد می‌شود.
-         *
-         * این ترتیب وابسته به app.json نیست.
-         * فقط ترتیب طبیعی Render شدن عناصر است.
-         */
-        views.forEachIndexed { index, view ->
-
-            val delay = when (index) {
-                0 -> 60L
-                1 -> 135L
-                2 -> 215L
-                else -> 285L
+            iconView?.let {
+                animateIconIn(it)
             }
 
-            val fade = ObjectAnimator.ofFloat(
-                view,
-                View.ALPHA,
-                0f,
-                1f
-            )
+            textView?.let {
+                animateTextIn(it)
+            }
 
-            val translate = ObjectAnimator.ofFloat(
-                view,
-                View.TRANSLATION_Y,
-                view.translationY,
-                0f
-            )
-
-            val scaleX = ObjectAnimator.ofFloat(
-                view,
-                View.SCALE_X,
-                view.scaleX,
-                1f
-            )
-
-            val scaleY = ObjectAnimator.ofFloat(
-                view,
-                View.SCALE_Y,
-                view.scaleY,
-                1f
-            )
-
-            AnimatorSet().apply {
-                playTogether(
-                    fade,
-                    translate,
-                    scaleX,
-                    scaleY
-                )
-
-                duration = when (index) {
-                    0 -> 430L
-                    1 -> 390L
-                    else -> 360L
-                }
-
-                startDelay = delay
-
-                interpolator = when (index) {
-                    0 -> OvershootInterpolator(0.65f)
-                    else -> enterInterpolator
-                }
-
-                start()
+            buttonView?.let {
+                animateButtonIn(it)
             }
         }
     }
 
-    // ================================================================
-    // BUTTON BACKGROUND
-    // ================================================================
-
-    /**
-     * ساخت Background دکمه بر اساس:
-     *
-     * btnShape
-     * btnStyle
-     * btnBg
-     * btnRadius
-     *
-     * تمام مقادیر از app.json می‌آیند.
+    /*
+     * =========================================================
+     * BOX
+     * =========================================================
      */
-    private fun buildButtonBackground(
-        w: WelcomeConfig
-    ): StateListDrawable {
-
-        val normal = GradientDrawable()
-
-        val bgColor = SvgHelper.parseColor(
-            w.btnBg
-        )
-
-        when (w.btnStyle) {
-
-            "outline" -> {
-                normal.setColor(
-                    0x00000000
-                )
-
-                normal.setStroke(
-                    SvgHelper.dp(this, 2),
-                    bgColor
-                )
-            }
-
-            else -> {
-                normal.setColor(
-                    bgColor
-                )
-            }
-        }
-
-        when (w.btnShape) {
-
-            "pill" -> {
-                normal.cornerRadius = 999f
-            }
-
-            "square" -> {
-                normal.cornerRadius = 0f
-            }
-
-            "rounded" -> {
-                normal.cornerRadius =
-                    SvgHelper.dp(
-                        this,
-                        w.btnRadius
-                    ).toFloat()
-            }
-
-            else -> {
-                normal.cornerRadius =
-                    SvgHelper.dp(
-                        this,
-                        w.btnRadius
-                    ).toFloat()
-            }
-        }
-
-        /*
-         * حالت pressed
-         *
-         * برای outline:
-         * همان ساختار با کمی تغییر در opacity.
-         *
-         * برای filled:
-         * رنگ همان رنگ اصلی باقی می‌ماند ولی
-         * Ripple توسط سیستم روی آن اعمال می‌شود.
-         */
-        val pressed = GradientDrawable()
-
-        when (w.btnStyle) {
-
-            "outline" -> {
-                pressed.setColor(
-                    0x12000000
-                )
-
-                pressed.setStroke(
-                    SvgHelper.dp(this, 2),
-                    bgColor
-                )
-            }
-
-            else -> {
-                pressed.setColor(
-                    bgColor
-                )
-            }
-        }
-
-        when (w.btnShape) {
-
-            "pill" -> {
-                pressed.cornerRadius = 999f
-            }
-
-            "square" -> {
-                pressed.cornerRadius = 0f
-            }
-
-            "rounded" -> {
-                pressed.cornerRadius =
-                    SvgHelper.dp(
-                        this,
-                        w.btnRadius
-                    ).toFloat()
-            }
-
-            else -> {
-                pressed.cornerRadius =
-                    SvgHelper.dp(
-                        this,
-                        w.btnRadius
-                    ).toFloat()
-            }
-        }
-
-        return StateListDrawable().apply {
-
-            addState(
-                intArrayOf(
-                    android.R.attr.state_pressed
-                ),
-                pressed
-            )
-
-            addState(
-                intArrayOf(),
-                normal
-            )
-        }
-    }
-
-    // ================================================================
-    // BOX
-    // ================================================================
 
     private fun makeBox(): LinearLayout {
 
         return LinearLayout(this).apply {
 
-            orientation = LinearLayout.VERTICAL
+            orientation =
+                LinearLayout.VERTICAL
 
-            gravity = Gravity.CENTER
+            gravity =
+                Gravity.CENTER
 
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                0,
-                1f
-            )
+            layoutParams =
+                LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    0,
+                    1f
+                )
 
             clipChildren = false
             clipToPadding = false
         }
     }
 
-    // ================================================================
-    // POSITION
-    // ================================================================
+    /*
+     * =========================================================
+     * POSITION
+     * =========================================================
+     */
 
     private fun pickBox(
         top: LinearLayout,
         center: LinearLayout,
         bottom: LinearLayout,
-        pos: String
+        position: String
     ): LinearLayout {
 
-        return when (pos) {
+        return when (position.lowercase()) {
 
-            "top" -> top
+            "top" ->
+                top
 
-            "center" -> center
+            "bottom" ->
+                bottom
 
-            "bottom" -> bottom
+            "center" ->
+                center
 
             /*
-             * رفتار قبلی حفظ شده:
              * اگر مقدار ناشناخته بود،
-             * مرکز انتخاب می‌شود.
+             * رفتار امن:
+             * مرکز
              */
-            else -> center
+            else ->
+                center
         }
     }
 
-    // ================================================================
-    // SAFE INSETS
-    // ================================================================
+    /*
+     * =========================================================
+     * BUTTON
+     * =========================================================
+     */
 
-    private fun applySafeInsets(
-        content: View
-    ) {
+    private fun buildButton(
+        welcome: AppConfig.WelcomeConfig
+    ): TextView {
 
-        ViewCompat.setOnApplyWindowInsetsListener(
-            content
-        ) { view, insets ->
+        return TextView(this).apply {
 
-            val systemBars =
-                insets.getInsets(
-                    WindowInsetsCompat.Type.systemBars()
+            /*
+             * متن از JSON
+             */
+            text =
+                welcome.btn
+
+            /*
+             * اندازه از JSON
+             */
+            textSize =
+                welcome.btnSize.toFloat()
+
+            /*
+             * رنگ متن از JSON
+             */
+            setTextColor(
+                SvgHelper.parseColor(
+                    welcome.btnTxt
+                )
+            )
+
+            gravity =
+                Gravity.CENTER
+
+            typeface =
+                loadFont()
+
+            includeFontPadding =
+                true
+
+            /*
+             * Padding داخلی
+             *
+             * این مقدار Layout Engine است،
+             * نه مقدار اختصاصی اپ.
+             */
+            setPadding(
+                SvgHelper.dp(
+                    this@WelcomeActivity,
+                    BUTTON_HORIZONTAL_PADDING
+                ),
+                SvgHelper.dp(
+                    this@WelcomeActivity,
+                    BUTTON_VERTICAL_PADDING
+                ),
+                SvgHelper.dp(
+                    this@WelcomeActivity,
+                    BUTTON_HORIZONTAL_PADDING
+                ),
+                SvgHelper.dp(
+                    this@WelcomeActivity,
+                    BUTTON_VERTICAL_PADDING
+                )
+            )
+
+            /*
+             * اندازه طبیعی دکمه
+             */
+            layoutParams =
+                LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+
+                    gravity =
+                        Gravity.CENTER
+                }
+
+            /*
+             * Background کاملاً از JSON
+             */
+            background =
+                makeButtonBackground(
+                    welcome
                 )
 
             /*
-             * فقط به padding موجود اضافه می‌کنیم.
-             * بنابراین مقدار اصلی PAD از بین نمی‌رود.
+             * Click
              */
-            view.setPadding(
-                SvgHelper.dp(
-                    this,
-                    PAD
-                ),
-                SvgHelper.dp(
-                    this,
-                    PAD
-                ) + systemBars.top,
-                SvgHelper.dp(
-                    this,
-                    PAD
-                ),
-                SvgHelper.dp(
-                    this,
-                    PAD
-                ) + systemBars.bottom
+            isClickable = true
+            isFocusable = true
+
+            setOnClickListener {
+                leaveWelcome()
+            }
+        }
+    }
+
+    /*
+     * =========================================================
+     * BUTTON BACKGROUND
+     * =========================================================
+     */
+
+    private fun makeButtonBackground(
+        welcome: AppConfig.WelcomeConfig
+    ): GradientDrawable {
+
+        return GradientDrawable().apply {
+
+            /*
+             * رنگ دکمه از JSON
+             */
+            setColor(
+                SvgHelper.parseColor(
+                    welcome.btnBg
+                )
             )
 
-            insets
+            /*
+             * Shape از JSON
+             */
+            cornerRadius =
+                resolveButtonRadius(
+                    welcome
+                )
+
+            /*
+             * Style از JSON
+             */
+            when (welcome.btnStyle.lowercase()) {
+
+                /*
+                 * flat:
+                 * بدون سایه
+                 */
+                "flat" -> {
+                    alpha = 255
+                }
+
+                /*
+                 * elevated:
+                 * خود View در ادامه Elevation می‌گیرد.
+                 */
+                "elevated" -> {
+                    alpha = 255
+                }
+
+                /*
+                 * هر مقدار ناشناخته:
+                 * امن و ساده
+                 */
+                else -> {
+                    alpha = 255
+                }
+            }
+        }
+    }
+
+    /*
+     * =========================================================
+     * BUTTON RADIUS
+     * =========================================================
+     *
+     * btnShape از JSON اولویت دارد.
+     *
+     * pill:
+     * دکمه کاملاً گرد
+     *
+     * round / rounded:
+     * از btnRadius استفاده می‌کند.
+     *
+     * square:
+     * گوشه تقریباً صفر
+     * =========================================================
+     */
+
+    private fun resolveButtonRadius(
+        welcome: AppConfig.WelcomeConfig
+    ): Float {
+
+        val shape =
+            welcome.btnShape.lowercase()
+
+        return when (shape) {
+
+            "pill" -> {
+
+                /*
+                 * برای pill شعاع را
+                 * بر اساس ارتفاع واقعی دکمه
+                 * در onLayout اصلاح می‌کنیم.
+                 *
+                 * مقدار بالا عمداً زیاد است.
+                 */
+                SvgHelper.dp(
+                    this,
+                    PILL_RADIUS
+                ).toFloat()
+            }
+
+            "round",
+            "rounded" -> {
+
+                SvgHelper.dp(
+                    this,
+                    welcome.btnRadius
+                ).toFloat()
+            }
+
+            "square" -> {
+                0f
+            }
+
+            else -> {
+
+                SvgHelper.dp(
+                    this,
+                    welcome.btnRadius
+                ).toFloat()
+            }
+        }
+    }
+
+    /*
+     * =========================================================
+     * ROOT ENTRANCE
+     * =========================================================
+     */
+
+    private fun playRootEntrance() {
+
+        root.animate()
+            .alpha(1f)
+            .setDuration(
+                ROOT_ENTER_DURATION
+            )
+            .setInterpolator(
+                DecelerateInterpolator(
+                    1.4f
+                )
+            )
+            .start()
+    }
+
+    /*
+     * =========================================================
+     * ICON ANIMATION
+     * =========================================================
+     */
+
+    private fun animateIconIn(
+        view: View
+    ) {
+
+        val alpha =
+            ObjectAnimator.ofFloat(
+                view,
+                View.ALPHA,
+                0f,
+                1f
+            )
+
+        val scaleX =
+            ObjectAnimator.ofFloat(
+                view,
+                View.SCALE_X,
+                ICON_START_SCALE,
+                1f
+            )
+
+        val scaleY =
+            ObjectAnimator.ofFloat(
+                view,
+                View.SCALE_Y,
+                ICON_START_SCALE,
+                1f
+            )
+
+        val translation =
+            ObjectAnimator.ofFloat(
+                view,
+                View.TRANSLATION_Y,
+                view.translationY,
+                0f
+            )
+
+        AnimatorSet().apply {
+
+            playTogether(
+                alpha,
+                scaleX,
+                scaleY,
+                translation
+            )
+
+            duration =
+                ICON_DURATION
+
+            startDelay =
+                ICON_DELAY
+
+            interpolator =
+                OvershootInterpolator(
+                    ICON_OVERSHOOT
+                )
+
+            start()
+        }
+    }
+
+    /*
+     * =========================================================
+     * TEXT ANIMATION
+     * =========================================================
+     */
+
+    private fun animateTextIn(
+        view: View
+    ) {
+
+        val alpha =
+            ObjectAnimator.ofFloat(
+                view,
+                View.ALPHA,
+                0f,
+                1f
+            )
+
+        val translation =
+            ObjectAnimator.ofFloat(
+                view,
+                View.TRANSLATION_Y,
+                view.translationY,
+                0f
+            )
+
+        AnimatorSet().apply {
+
+            playTogether(
+                alpha,
+                translation
+            )
+
+            duration =
+                TEXT_DURATION
+
+            startDelay =
+                TEXT_DELAY
+
+            interpolator =
+                DecelerateInterpolator(
+                    1.35f
+                )
+
+            start()
+        }
+    }
+
+    /*
+     * =========================================================
+     * BUTTON ANIMATION
+     * =========================================================
+     */
+
+    private fun animateButtonIn(
+        view: TextView
+    ) {
+
+        /*
+         * Elevated فقط وقتی در JSON انتخاب شده،
+         * Elevation واقعی می‌گیرد.
+         */
+        if (
+            config.welcome.btnStyle
+                .equals(
+                    "elevated",
+                    ignoreCase = true
+                )
+        ) {
+
+            view.elevation =
+                SvgHelper.dp(
+                    this,
+                    BUTTON_ELEVATION
+                ).toFloat()
         }
 
-        ViewCompat.requestApplyInsets(
-            content
+        val alpha =
+            ObjectAnimator.ofFloat(
+                view,
+                View.ALPHA,
+                0f,
+                1f
+            )
+
+        val scaleX =
+            ObjectAnimator.ofFloat(
+                view,
+                View.SCALE_X,
+                BUTTON_START_SCALE,
+                1f
+            )
+
+        val scaleY =
+            ObjectAnimator.ofFloat(
+                view,
+                View.SCALE_Y,
+                BUTTON_START_SCALE,
+                1f
+            )
+
+        val translation =
+            ObjectAnimator.ofFloat(
+                view,
+                View.TRANSLATION_Y,
+                view.translationY,
+                0f
+            )
+
+        AnimatorSet().apply {
+
+            playTogether(
+                alpha,
+                scaleX,
+                scaleY,
+                translation
+            )
+
+            duration =
+                BUTTON_DURATION
+
+            startDelay =
+                BUTTON_DELAY
+
+            interpolator =
+                OvershootInterpolator(
+                    BUTTON_OVERSHOOT
+                )
+
+            start()
+        }
+    }
+
+    /*
+     * =========================================================
+     * LEAVE
+     * =========================================================
+     */
+
+    private fun leaveWelcome() {
+
+        if (isLeaving) {
+            return
+        }
+
+        isLeaving = true
+
+        /*
+         * جلوگیری از کلیک مجدد
+         */
+        content.isEnabled = false
+
+        /*
+         * خروج محسوس اما نرم
+         */
+        content.animate()
+            .translationY(
+                -SvgHelper.dp(
+                    this,
+                    EXIT_TRANSLATION_Y
+                ).toFloat()
+            )
+            .alpha(0f)
+            .scaleX(EXIT_SCALE)
+            .scaleY(EXIT_SCALE)
+            .setDuration(
+                EXIT_DURATION
+            )
+            .setInterpolator(
+                DecelerateInterpolator(
+                    1.35f
+                )
+            )
+            .withEndAction {
+
+                openWeb()
+            }
+            .start()
+    }
+
+    /*
+     * =========================================================
+     * OPEN WEB
+     * =========================================================
+     *
+     * Welcome فقط صفحه ورود است.
+     *
+     * مقصد بعدی:
+     * WebActivity
+     *
+     * خود WebActivity از config.web
+     * استفاده می‌کند.
+     * =========================================================
+     */
+
+    private fun openWeb() {
+
+        startActivity(
+            Intent(
+                this,
+                WebActivity::class.java
+            )
+        )
+
+        overridePendingTransition(
+            0,
+            0
+        )
+
+        finish()
+
+        overridePendingTransition(
+            0,
+            0
         )
     }
 
-    // ================================================================
-    // FONT
-    // ================================================================
+    /*
+     * =========================================================
+     * FONT
+     * =========================================================
+     */
 
     private fun loadFont(): Typeface? {
 
@@ -770,46 +1075,91 @@ class WelcomeActivity : AppCompatActivity() {
         }
     }
 
-    // ================================================================
-    // OPEN WEB
-    // ================================================================
-
-    private fun openWebActivity() {
-
-        /*
-         * رفتار فعلی برنامه حفظ شده:
-         * Welcome → WebActivity
-         */
-        startActivity(
-            Intent(
-                this,
-                WebActivity::class.java
-            )
-        )
-
-        /*
-         * جلوگیری از transition قدیمی اندروید
-         * تا ورود به WebActivity حس یک صفحه جدید و
-         * ناگهانی نداشته باشد.
-         */
-        overridePendingTransition(
-            android.R.anim.fade_in,
-            android.R.anim.fade_out
-        )
-
-        finish()
-    }
-
-    // ================================================================
-    // CONSTANTS
-    // ================================================================
+    /*
+     * =========================================================
+     * CONSTANTS
+     *
+     * این‌ها تنظیمات Engine هستند،
+     * نه اطلاعات اپ.
+     *
+     * بنابراین در app.json قرار نمی‌گیرند.
+     * =========================================================
+     */
 
     companion object {
 
         /*
-         * این مقدار مربوط به Renderer است،
-         * نه محتوای app.json.
+         * Layout
          */
-        private const val PAD = 24
+        private const val CONTENT_PADDING = 24
+
+        /*
+         * Text
+         */
+        private const val DESCRIPTION_TOP_PADDING = 10
+
+        private const val TITLE_LINE_SPACING = 1.08f
+
+        private const val DESCRIPTION_LINE_SPACING = 1.12f
+
+        /*
+         * Root entrance
+         */
+        private const val ROOT_ENTER_DURATION = 280L
+
+        /*
+         * Icon
+         */
+        private const val ICON_START_SCALE = 0.78f
+
+        private const val ICON_START_Y = 34
+
+        private const val ICON_DELAY = 60L
+
+        private const val ICON_DURATION = 650L
+
+        private const val ICON_OVERSHOOT = 0.72f
+
+        /*
+         * Text
+         */
+        private const val TEXT_START_Y = 24
+
+        private const val TEXT_DELAY = 160L
+
+        private const val TEXT_DURATION = 500L
+
+        /*
+         * Button
+         */
+        private const val BUTTON_START_SCALE = 0.82f
+
+        private const val BUTTON_START_Y = 26
+
+        private const val BUTTON_DELAY = 280L
+
+        private const val BUTTON_DURATION = 520L
+
+        private const val BUTTON_OVERSHOOT = 0.7f
+
+        private const val BUTTON_HORIZONTAL_PADDING = 30
+
+        private const val BUTTON_VERTICAL_PADDING = 12
+
+        private const val BUTTON_ELEVATION = 7
+
+        /*
+         * فقط برای shape = pill
+         */
+        private const val PILL_RADIUS = 100
+
+        /*
+         * Exit
+         */
+        private const val EXIT_DURATION = 380L
+
+        private const val EXIT_TRANSLATION_Y = 20
+
+        private const val EXIT_SCALE = 0.965f
     }
 }
