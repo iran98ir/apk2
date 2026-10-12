@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import kotlin.math.abs
 
 /**
  * =========================================================
@@ -28,14 +29,13 @@ import androidx.viewpager2.widget.ViewPager2
  * - هر تعداد صفحه بر اساس onb.count
  * - محتوای صفحات از onb.pages
  * - Swipe طبیعی
- * - Transition نرم
+ * - Transition محسوس و Premium
  * - PageTransformer حرفه‌ای
  * - حالت 2 صفحه‌ای
  * - حالت 3 صفحه‌ای
  * - Swipe اضافه در آخرین صفحه → Welcome
- * - بدون نمایش صفحه جعلی
- * - بدون پرش
- * - بدون صفحه سوم لحظه‌ای در حالت count=2
+ * - بدون صفحه جعلی
+ * - بدون هاردکد محتوای اپ
  * =========================================================
  */
 class OnboardingActivity : AppCompatActivity() {
@@ -75,6 +75,12 @@ class OnboardingActivity : AppCompatActivity() {
                 onb.bg2,
                 onb.bgAngle
             )
+
+            /*
+             * شروع بسیار کوتاه با Fade
+             * برای جلوگیری از Flash اولیه.
+             */
+            alpha = 0f
         }
 
         val col = LinearLayout(this).apply {
@@ -84,6 +90,9 @@ class OnboardingActivity : AppCompatActivity() {
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT
             )
+
+            clipChildren = false
+            clipToPadding = false
         }
 
         root.addView(col)
@@ -97,9 +106,7 @@ class OnboardingActivity : AppCompatActivity() {
                 ?: onb.pages.size
 
         /*
-         * تعداد صفحات فقط از کانفیگ می‌آید.
-         * اگر count بیشتر از صفحات موجود باشد،
-         * فقط صفحات واقعی استفاده می‌شوند.
+         * فقط صفحات واقعی کانفیگ.
          */
         val visiblePages =
             onb.pages.take(
@@ -120,39 +127,34 @@ class OnboardingActivity : AppCompatActivity() {
                 1f
             )
 
-            /*
-             * فقط صفحات واقعی کانفیگ.
-             *
-             * هیچ صفحه جعلی ساخته نمی‌شود.
-             */
             adapter = OnbAdapter(
                 visiblePages,
                 onb.txt
             )
 
-            /*
-             * یک صفحه مجاور برای Transition نرم.
-             */
             offscreenPageLimit = 1
 
-            /*
-             * جلوگیری از افکت Glow/Edge قدیمی RecyclerView.
-             *
-             * در آخرین صفحه نباید کشش سفید/خالی دیده شود.
-             */
-            overScrollMode = View.OVER_SCROLL_NEVER
+            overScrollMode =
+                View.OVER_SCROLL_NEVER
 
             clipToPadding = false
             clipChildren = false
 
-            /*
-             * حساسیت طبیعی ViewPager2.
-             */
             isUserInputEnabled = true
+
+            /*
+             * اجازه می‌دهیم صفحات در محدوده
+             * طبیعی خودشان آزادانه Transform شوند.
+             */
+            (getChildAt(0) as? RecyclerView)?.apply {
+                clipToPadding = false
+                clipChildren = false
+                overScrollMode = View.OVER_SCROLL_NEVER
+            }
         }
 
         /*
-         * Transition اصلی صفحات
+         * Transition اصلی و محسوس.
          */
         pager.setPageTransformer(
             PremiumPageTransformer()
@@ -166,35 +168,40 @@ class OnboardingActivity : AppCompatActivity() {
 
         dotsContainer = LinearLayout(this).apply {
 
-            orientation = LinearLayout.HORIZONTAL
+            orientation =
+                LinearLayout.HORIZONTAL
 
-            gravity = Gravity.CENTER
+            gravity =
+                Gravity.CENTER
 
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply {
+            layoutParams =
+                LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
 
-                bottomMargin =
-                    SvgHelper.dp(
-                        this@OnboardingActivity,
-                        DOT_BOTTOM_MARGIN
-                    )
+                    bottomMargin =
+                        SvgHelper.dp(
+                            this@OnboardingActivity,
+                            DOT_BOTTOM_MARGIN
+                        )
 
-                topMargin =
-                    SvgHelper.dp(
-                        this@OnboardingActivity,
-                        DOT_TOP_MARGIN
-                    )
-            }
+                    topMargin =
+                        SvgHelper.dp(
+                            this@OnboardingActivity,
+                            DOT_TOP_MARGIN
+                        )
+                }
         }
 
         col.addView(dotsContainer)
 
-        buildDots(
-            onb.txt,
-            0
-        )
+        if (totalPages > 0) {
+            buildDots(
+                onb.txt,
+                0
+            )
+        }
 
         /* =====================================================
            PAGE CHANGE
@@ -221,33 +228,13 @@ class OnboardingActivity : AppCompatActivity() {
            EXTRA SWIPE
            ===================================================== */
 
-        /*
-         * در آخرین صفحه:
-         *
-         * اگر کاربر دوباره به چپ Swipe کند،
-         * ViewPager2 صفحه جدیدی ندارد.
-         *
-         * بنابراین ما Transition اختصاصی خودمان را اجرا می‌کنیم
-         * و مستقیم Welcome را باز می‌کنیم.
-         *
-         * این باعث می‌شود:
-         *
-         * count = 2
-         * page 1 → page 2 → Welcome
-         *
-         * count = 3
-         * page 1 → page 2 → page 3 → Welcome
-         *
-         * بدون هیچ صفحه جعلی.
-         */
         pager.getChildAt(0).setOnTouchListener { _, event ->
 
             handlePagerTouch(event)
 
             /*
              * false:
-             * اجازه می‌دهیم ViewPager2 خودش
-             * Swipe صفحات واقعی را انجام دهد.
+             * خود ViewPager2 همچنان Swipe طبیعی را مدیریت می‌کند.
              */
             false
         }
@@ -262,6 +249,21 @@ class OnboardingActivity : AppCompatActivity() {
             this,
             config
         )
+
+        /*
+         * Fade اولیه بسیار کوتاه.
+         */
+        root.post {
+            root.animate()
+                .alpha(1f)
+                .setDuration(INITIAL_FADE_DURATION)
+                .setInterpolator(
+                    android.view.animation.DecelerateInterpolator(
+                        1.4f
+                    )
+                )
+                .start()
+        }
     }
 
     /* =========================================================
@@ -281,7 +283,8 @@ class OnboardingActivity : AppCompatActivity() {
         }
 
         /*
-         * فقط آخرین صفحه.
+         * فقط روی آخرین صفحه،
+         * Swipe اضافه را برای Welcome بررسی می‌کنیم.
          */
         if (currentPage != totalPages - 1) {
             return
@@ -303,17 +306,9 @@ class OnboardingActivity : AppCompatActivity() {
                 val dy =
                     event.y - touchStartY
 
-                /*
-                 * فقط Swipe افقی واقعی.
-                 */
                 val horizontal =
-                    kotlin.math.abs(dx) >
-                        kotlin.math.abs(dy)
+                    abs(dx) > abs(dy)
 
-                /*
-                 * در ViewPager:
-                 * Swipe به چپ = dx منفی
-                 */
                 if (
                     dx < -swipeThreshold &&
                     horizontal
@@ -337,29 +332,32 @@ class OnboardingActivity : AppCompatActivity() {
 
         isFinishingOnboarding = true
 
-        /*
-         * دیگر اجازه Swipe نده.
-         */
         pager.isUserInputEnabled = false
 
-        /*
-         * View فعلی.
-         */
         val currentView =
             pager.getChildAt(0)
 
         /*
-         * انیمیشن بسیار نرم:
+         * Transition محسوس‌تر:
          *
-         * صفحه کمی به چپ می‌رود
-         * همزمان کمی Fade می‌شود
-         * و کمی Scale می‌گیرد.
+         * صفحه:
+         * - به چپ می‌رود
+         * - کوچک می‌شود
+         * - محو می‌شود
          *
-         * حس Transition اپلیکیشن می‌دهد.
+         * این حرکت باید واضح دیده شود،
+         * اما همچنان Premium باقی بماند.
          */
         currentView?.animate()
             ?.translationX(
-                -currentView.width * FINISH_TRANSLATION
+                -currentView.width *
+                    FINISH_TRANSLATION
+            )
+            ?.translationY(
+                -SvgHelper.dp(
+                    this,
+                    10
+                ).toFloat()
             )
             ?.alpha(0f)
             ?.scaleX(FINISH_SCALE)
@@ -374,15 +372,13 @@ class OnboardingActivity : AppCompatActivity() {
                 )
             )
             ?.withEndAction {
-
                 openWelcome()
             }
             ?.start()
 
         /*
-         * خود پس‌زمینه تقریباً ثابت می‌ماند.
-         * این موضوع باعث می‌شود Transition
-         * حس اپلیکیشن داشته باشد نه صفحه وب.
+         * پس‌زمینه تقریباً ثابت می‌ماند.
+         * این کار باعث می‌شود حرکت اصلی متعلق به محتوا باشد.
          */
         root.animate()
             .alpha(FINISH_ROOT_ALPHA)
@@ -404,9 +400,6 @@ class OnboardingActivity : AppCompatActivity() {
 
     private fun openWelcome() {
 
-        /*
-         * ثبت اینکه Onboarding دیده شده.
-         */
         getSharedPreferences(
             PREFS,
             MODE_PRIVATE
@@ -433,8 +426,8 @@ class OnboardingActivity : AppCompatActivity() {
         )
 
         /*
-         * جلوگیری از Transition پیش‌فرض
-         * سیستم که ممکن است با انیمیشن ما تداخل کند.
+         * هیچ Transition پیش‌فرض اندروید
+         * با Transition خودمان قاطی نمی‌شود.
          */
         overridePendingTransition(
             0,
@@ -460,8 +453,14 @@ class OnboardingActivity : AppCompatActivity() {
 
         dotsContainer.removeAllViews()
 
+        if (totalPages <= 0) {
+            return
+        }
+
         val baseColor =
-            SvgHelper.parseColor(txtColor)
+            SvgHelper.parseColor(
+                txtColor
+            )
 
         val glowColor =
             withAlpha(
@@ -526,6 +525,22 @@ class OnboardingActivity : AppCompatActivity() {
                                 else
                                     gap
                         }
+
+                    /*
+                     * تغییر وضعیت Dot با Scale کوچک
+                     * باعث می‌شود تغییر صفحه محسوس‌تر شود.
+                     */
+                    scaleX =
+                        if (isActive)
+                            1f
+                        else
+                            DOT_INACTIVE_SCALE
+
+                    scaleY =
+                        if (isActive)
+                            1f
+                        else
+                            DOT_INACTIVE_SCALE
                 }
 
             /* =================================================
@@ -630,18 +645,6 @@ class OnboardingActivity : AppCompatActivity() {
                                 )
                             }
 
-                    if (
-                        android.os.Build.VERSION.SDK_INT >=
-                        android.os.Build.VERSION_CODES.P
-                    ) {
-
-                        outlineAmbientShadowColor =
-                            glowColor
-
-                        outlineSpotShadowColor =
-                            glowColor
-                    }
-
                     elevation =
                         SvgHelper.dp(
                             this@OnboardingActivity,
@@ -652,6 +655,29 @@ class OnboardingActivity : AppCompatActivity() {
             wrap.addView(dot)
 
             dotsContainer.addView(wrap)
+
+            /*
+             * ورود Dot فعال.
+             */
+            if (isActive) {
+
+                wrap.scaleX =
+                    DOT_ACTIVE_START_SCALE
+
+                wrap.scaleY =
+                    DOT_ACTIVE_START_SCALE
+
+                wrap.animate()
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(DOT_ANIMATION_DURATION)
+                    .setInterpolator(
+                        android.view.animation.OvershootInterpolator(
+                            1.15f
+                        )
+                    )
+                    .start()
+            }
         }
     }
 
@@ -660,19 +686,21 @@ class OnboardingActivity : AppCompatActivity() {
        ========================================================= */
 
     /**
-     * Transition صفحات واقعی.
+     * =========================================================
+     * محسوس‌تر از نسخه قبلی
      *
-     * خروج:
-     * - کمی Fade
-     * - کمی Scale
-     * - حرکت افقی
+     * نسخه قبلی:
+     * MIN_SCALE = 0.94
+     * FADE = 0.25
+     * TRANSLATION = 0.12
      *
-     * ورود:
-     * - Fade in
-     * - Scale up
-     * - حرکت نرم
+     * نسخه جدید:
+     * MIN_SCALE = 0.84
+     * FADE = 0.55
+     * TRANSLATION = 0.34
      *
-     * هیچ مقدار محتوایی از JSON اینجا هاردکد نشده.
+     * بنابراین هنگام Swipe واقعاً دیده می‌شود.
+     * =========================================================
      */
     private class PremiumPageTransformer :
         ViewPager2.PageTransformer {
@@ -685,13 +713,15 @@ class OnboardingActivity : AppCompatActivity() {
             when {
 
                 /*
-                 * صفحه خارج‌شونده به چپ
+                 * کاملاً خارج از سمت چپ
                  */
                 position <= -1f -> {
 
                     page.alpha = 0f
 
                     page.translationX = 0f
+
+                    page.translationY = 0f
 
                     page.scaleX =
                         MIN_SCALE
@@ -701,28 +731,51 @@ class OnboardingActivity : AppCompatActivity() {
                 }
 
                 /*
-                 * صفحه در حال حرکت
+                 * صفحه‌ای که در حال خروج است
                  */
                 position < 0f -> {
 
                     val p =
-                        kotlin.math.abs(position)
+                        abs(position)
+                            .coerceIn(
+                                0f,
+                                1f
+                            )
 
+                    /*
+                     * Fade واضح‌تر.
+                     */
                     page.alpha =
-                        1f - (
-                            p * FADE_AMOUNT
-                        )
-
-                    page.translationX =
-                        -page.width *
-                        position *
-                        TRANSLATION_FACTOR
-
-                    val scale =
-                        MAX_SCALE -
+                        1f -
                             (
                                 p *
-                                (MAX_SCALE - MIN_SCALE)
+                                    FADE_AMOUNT
+                            )
+
+                    /*
+                     * حرکت افقی محسوس.
+                     */
+                    page.translationX =
+                        page.width *
+                            position *
+                            TRANSLATION_FACTOR
+
+                    /*
+                     * حرکت عمودی بسیار کم.
+                     */
+                    page.translationY =
+                        page.height *
+                            p *
+                            VERTICAL_FACTOR
+
+                    /*
+                     * Scale محسوس ولی Premium.
+                     */
+                    val scale =
+                        1f -
+                            (
+                                p *
+                                    (1f - MIN_SCALE)
                             )
 
                     page.scaleX = scale
@@ -730,7 +783,7 @@ class OnboardingActivity : AppCompatActivity() {
                 }
 
                 /*
-                 * صفحه فعال
+                 * صفحه کاملاً فعال
                  */
                 position == 0f -> {
 
@@ -738,32 +791,58 @@ class OnboardingActivity : AppCompatActivity() {
 
                     page.translationX = 0f
 
+                    page.translationY = 0f
+
                     page.scaleX = 1f
                     page.scaleY = 1f
                 }
 
                 /*
-                 * صفحه‌ای که از سمت راست وارد می‌شود
+                 * صفحه جدید که از سمت راست وارد می‌شود
                  */
                 position <= 1f -> {
 
-                    val p = position
-
-                    page.alpha =
-                        1f - (
-                            p * FADE_AMOUNT
+                    val p =
+                        position.coerceIn(
+                            0f,
+                            1f
                         )
 
-                    page.translationX =
-                        -page.width *
-                        p *
-                        TRANSLATION_FACTOR
-
-                    val scale =
-                        MAX_SCALE -
+                    /*
+                     * صفحه جدید ابتدا کمی محو است
+                     * و همزمان وارد می‌شود.
+                     */
+                    page.alpha =
+                        1f -
                             (
                                 p *
-                                (MAX_SCALE - MIN_SCALE)
+                                    FADE_AMOUNT
+                            )
+
+                    /*
+                     * حرکت افقی واضح.
+                     */
+                    page.translationX =
+                        -page.width *
+                            p *
+                            TRANSLATION_FACTOR
+
+                    /*
+                     * حرکت عمودی مخالف صفحه قبلی.
+                     */
+                    page.translationY =
+                        -page.height *
+                            p *
+                            VERTICAL_FACTOR
+
+                    /*
+                     * Scale از 0.84 به 1.
+                     */
+                    val scale =
+                        MIN_SCALE +
+                            (
+                                (1f - p) *
+                                    (1f - MIN_SCALE)
                             )
 
                     page.scaleX = scale
@@ -776,6 +855,12 @@ class OnboardingActivity : AppCompatActivity() {
                 else -> {
 
                     page.alpha = 0f
+
+                    page.scaleX =
+                        MIN_SCALE
+
+                    page.scaleY =
+                        MIN_SCALE
                 }
             }
         }
@@ -881,7 +966,9 @@ class OnboardingActivity : AppCompatActivity() {
                             ctx,
                             PAD
                         )
-                    )
+
+                    clipChildren = false
+                    clipToPadding = false
                 }
 
             val top =
@@ -992,6 +1079,13 @@ class OnboardingActivity : AppCompatActivity() {
 
                         typeface =
                             loadFont()
+
+                        includeFontPadding = true
+
+                        setLineSpacing(
+                            0f,
+                            1.05f
+                        )
                     }
 
                 textBox.addView(
@@ -1019,6 +1113,8 @@ class OnboardingActivity : AppCompatActivity() {
                         typeface =
                             loadFont()
 
+                        includeFontPadding = true
+
                         setPadding(
                             0,
                             SvgHelper.dp(
@@ -1027,6 +1123,11 @@ class OnboardingActivity : AppCompatActivity() {
                             ),
                             0,
                             0
+                        )
+
+                        setLineSpacing(
+                            0f,
+                            1.10f
                         )
                     }
 
@@ -1063,6 +1164,9 @@ class OnboardingActivity : AppCompatActivity() {
                         0,
                         1f
                     )
+
+                clipChildren = false
+                clipToPadding = false
             }
 
         private fun pickBox(
@@ -1092,18 +1196,28 @@ class OnboardingActivity : AppCompatActivity() {
     companion object {
 
         /*
-         * اینها تنظیمات انیمیشن هستند،
-         * نه تنظیمات محتوای Onboarding.
-         * بنابراین وابسته به app.json نیستند.
+         * Layout
          */
-
         private const val PAD = 24
 
+        /*
+         * Swipe
+         */
         private const val SWIPE_THRESHOLD = 80f
 
+        /*
+         * SharedPreferences
+         */
         private const val PREFS = "app_prefs"
 
-        /* Dots */
+        /*
+         * Initial appearance
+         */
+        private const val INITIAL_FADE_DURATION = 240L
+
+        /*
+         * Dots
+         */
         private const val DOT_BOTTOM_MARGIN = 40
         private const val DOT_TOP_MARGIN = 20
 
@@ -1115,17 +1229,48 @@ class OnboardingActivity : AppCompatActivity() {
         private const val DOT_GLOW_ALPHA = 0.45f
         private const val DOT_ALPHA = 0.95f
 
-        /* Page Transition */
-        private const val MIN_SCALE = 0.94f
-        private const val MAX_SCALE = 1.0f
+        private const val DOT_INACTIVE_SCALE = 0.92f
+        private const val DOT_ACTIVE_START_SCALE = 0.72f
+        private const val DOT_ANIMATION_DURATION = 260L
 
-        private const val FADE_AMOUNT = 0.25f
-        private const val TRANSLATION_FACTOR = 0.12f
+        /*
+         * =====================================================
+         * PAGE TRANSITION
+         * =====================================================
+         *
+         * عمداً محسوس‌تر از نسخه قبلی.
+         */
 
-        /* Final → Welcome */
-        private const val FINISH_DURATION = 420L
-        private const val FINISH_TRANSLATION = 0.18f
-        private const val FINISH_SCALE = 0.985f
+        private const val MIN_SCALE = 0.84f
+
+        /*
+         * Fade بیشتر،
+         * اما هنوز صفحه قبلی کاملاً ناگهانی محو نمی‌شود.
+         */
+        private const val FADE_AMOUNT = 0.55f
+
+        /*
+         * حرکت افقی واضح‌تر.
+         */
+        private const val TRANSLATION_FACTOR = 0.34f
+
+        /*
+         * حرکت عمودی بسیار کم برای حس عمق.
+         */
+        private const val VERTICAL_FACTOR = 0.035f
+
+        /*
+         * =====================================================
+         * FINAL → WELCOME
+         * =====================================================
+         */
+
+        private const val FINISH_DURATION = 460L
+
+        private const val FINISH_TRANSLATION = 0.24f
+
+        private const val FINISH_SCALE = 0.94f
+
         private const val FINISH_ROOT_ALPHA = 0.98f
     }
-}
+                        }
