@@ -16,25 +16,6 @@ import android.webkit.WebViewClient
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 
-/**
- * WebView اصلی اپ
- *
- * قوانین:
- *
- * 1) web.url
- *    صفحه اصلی اپ است و داخل WebView باز می‌شود.
- *
- * 2) web.browserOnly
- *    لینک‌هایی که باید حتماً خارج از اپ و در مرورگر
- *    پیش‌فرض سیستم باز شوند.
- *
- * 3) web.extLink
- *    در صورت فعال بودن، لینک‌های خارج از دامنه اصلی
- *    در مرورگر باز می‌شوند.
- *
- * 4) هیچ URLای در این فایل هاردکد نشده است.
- *    تمام URLها فقط از app.json خوانده می‌شوند.
- */
 class WebActivity : AppCompatActivity() {
 
     private lateinit var config: AppConfig
@@ -44,16 +25,10 @@ class WebActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // ---------------------------------------------------------
-        // بارگذاری تنظیمات از app.json
-        // ---------------------------------------------------------
+        // خواندن کانفیگ app.json
         config = ConfigLoader.load(this)
-
         val web = config.web
 
-        // ---------------------------------------------------------
-        // ساخت WebView
-        // ---------------------------------------------------------
         val root = FrameLayout(this)
 
         webView = WebView(this).apply {
@@ -63,9 +38,9 @@ class WebActivity : AppCompatActivity() {
             )
         }
 
-        // ---------------------------------------------------------
+        // =========================
         // تنظیمات WebView
-        // ---------------------------------------------------------
+        // =========================
         val settings = webView.settings
 
         settings.javaScriptEnabled = true
@@ -87,49 +62,37 @@ class WebActivity : AppCompatActivity() {
         settings.setSupportMultipleWindows(true)
         settings.javaScriptCanOpenWindowsAutomatically = true
 
-        // ---------------------------------------------------------
-        // Cookie
-        // ---------------------------------------------------------
+        // =========================
+        // کوکی‌ها
+        // =========================
         if (web.keepSession) {
-
             CookieManager.getInstance().setAcceptCookie(true)
-
             CookieManager.getInstance()
                 .setAcceptThirdPartyCookies(webView, true)
-
         } else {
-
             CookieManager.getInstance().setAcceptCookie(false)
-
             CookieManager.getInstance()
                 .setAcceptThirdPartyCookies(webView, false)
 
-            CookieManager.getInstance()
-                .removeAllCookies(null)
+            CookieManager.getInstance().removeAllCookies(null)
         }
 
-        // ---------------------------------------------------------
+        // =========================
         // WebViewClient
-        // ---------------------------------------------------------
+        // =========================
         webView.webViewClient = object : WebViewClient() {
 
-            /**
-             * تمام navigationهای داخل WebView از اینجا عبور می‌کنند.
-             */
+            // نسخه جدید اندروید
             override fun shouldOverrideUrlLoading(
                 view: WebView,
                 request: WebResourceRequest
             ): Boolean {
 
-                val url = request.url.toString()
-
-                return handleUrl(url)
+                return handleUrl(request.url.toString())
             }
 
-            /**
-             * برای سازگاری با WebViewهای قدیمی‌تر.
-             */
-            @Suppress("OVERRIDE_DEPRECATION")
+            // پشتیبانی از نسخه‌های قدیمی اندروید
+            @Suppress("DEPRECATION")
             override fun shouldOverrideUrlLoading(
                 view: WebView,
                 url: String
@@ -153,29 +116,17 @@ class WebActivity : AppCompatActivity() {
             ) {
                 super.onReceivedError(view, request, error)
 
-                // فقط خطای صفحه اصلی
                 if (request.isForMainFrame) {
-                    gotoError(
-                        mapErrorCode(error.errorCode)
-                    )
+                    gotoError(mapErrorCode(error.errorCode))
                 }
             }
         }
 
-        // ---------------------------------------------------------
+        // =========================
         // WebChromeClient
-        // ---------------------------------------------------------
+        // =========================
         webView.webChromeClient = object : WebChromeClient() {
 
-            /**
-             * مدیریت:
-             *
-             * target="_blank"
-             * window.open()
-             *
-             * لینک browserOnly در این مسیر هم
-             * حتماً به مرورگر سیستم می‌رود.
-             */
             override fun onCreateWindow(
                 view: WebView,
                 isDialog: Boolean,
@@ -185,19 +136,9 @@ class WebActivity : AppCompatActivity() {
 
                 val tempWebView = WebView(this@WebActivity)
 
-                // تنظیمات لازم برای WebView موقت
-                val tempSettings = tempWebView.settings
+                tempWebView.settings.javaScriptEnabled = true
+                tempWebView.settings.domStorageEnabled = true
 
-                tempSettings.javaScriptEnabled = true
-                tempSettings.domStorageEnabled = true
-                tempSettings.databaseEnabled = true
-
-                tempSettings.setSupportMultipleWindows(false)
-                tempSettings.javaScriptCanOpenWindowsAutomatically = true
-
-                // -------------------------------------------------
-                // Client برای WebView موقت
-                // -------------------------------------------------
                 tempWebView.webViewClient =
                     object : WebViewClient() {
 
@@ -208,22 +149,52 @@ class WebActivity : AppCompatActivity() {
 
                             val url = request.url.toString()
 
-                            return handleNewWindowUrl(url)
+                            // لینک تبلیغ → مرورگر
+                            if (isBrowserOnlyUrl(url)) {
+                                openExternalBrowser(url)
+                                return true
+                            }
+
+                            // لینک خارجی → مرورگر
+                            if (
+                                web.extLink &&
+                                isHttpUrl(url) &&
+                                !isSameDomain(url, web.url)
+                            ) {
+                                openExternalBrowser(url)
+                                return true
+                            }
+
+                            // بقیه لینک‌ها → WebView اصلی
+                            webView.loadUrl(url)
+                            return true
                         }
 
-                        @Suppress("OVERRIDE_DEPRECATION")
+                        @Suppress("DEPRECATION")
                         override fun shouldOverrideUrlLoading(
                             v: WebView,
                             url: String
                         ): Boolean {
 
-                            return handleNewWindowUrl(url)
+                            if (isBrowserOnlyUrl(url)) {
+                                openExternalBrowser(url)
+                                return true
+                            }
+
+                            if (
+                                web.extLink &&
+                                isHttpUrl(url) &&
+                                !isSameDomain(url, web.url)
+                            ) {
+                                openExternalBrowser(url)
+                                return true
+                            }
+
+                            webView.loadUrl(url)
+                            return true
                         }
                     }
 
-                // -------------------------------------------------
-                // تحویل WebView موقت به WebViewTransport
-                // -------------------------------------------------
                 val transport =
                     resultMsg.obj as WebView.WebViewTransport
 
@@ -235,180 +206,82 @@ class WebActivity : AppCompatActivity() {
             }
         }
 
-        // ---------------------------------------------------------
-        // قرار دادن WebView روی صفحه
-        // ---------------------------------------------------------
         root.addView(webView)
-
         setContentView(root)
 
-        // ---------------------------------------------------------
-        // System Bars
-        // ---------------------------------------------------------
         ThemeHelper.applySystemBars(this, config)
 
-        // ---------------------------------------------------------
-        // فقط URL اصلی JSON
-        // ---------------------------------------------------------
+        // =========================
+        // صفحه اصلی app.json
+        // =========================
         webView.loadUrl(web.url)
     }
 
-    // =============================================================
-    // مدیریت URL اصلی
-    // =============================================================
+    // =========================================================
+    // تشخیص URL
+    // =========================================================
 
-    /**
-     * تصمیم می‌گیرد URL کجا باز شود:
-     *
-     * browserOnly → مرورگر
-     * deepLink → Intent
-     * extLink → مرورگر
-     * بقیه → WebView
-     */
     private fun handleUrl(url: String): Boolean {
 
-        val web = config.web
+        // -------------------------
+        // لینک‌های غیر HTTP
+        // -------------------------
+        if (!isHttpUrl(url)) {
 
-        // ---------------------------------------------------------
-        // URLهای غیر HTTP/HTTPS
-        // ---------------------------------------------------------
-        if (
-            !url.startsWith("http://", ignoreCase = true) &&
-            !url.startsWith("https://", ignoreCase = true)
-        ) {
-
-            if (web.deepLink) {
-
-                return openExternalBrowserOrIntent(url)
+            if (config.web.deepLink) {
+                try {
+                    startActivity(
+                        Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse(url)
+                        )
+                    )
+                } catch (_: Exception) {
+                }
             }
 
             return true
         }
 
-        // ---------------------------------------------------------
+        // -------------------------
         // browserOnly
-        //
-        // مهم:
-        // تطابق دقیق با مقدار داخل JSON
-        // ---------------------------------------------------------
-        if (
-            matchesBrowserOnly(
-                url = url,
-                browserOnly = web.browserOnly
-            )
-        ) {
-
-            openInDefaultBrowser(url)
-
+        // -------------------------
+        if (isBrowserOnlyUrl(url)) {
+            openExternalBrowser(url)
             return true
         }
 
-        // ---------------------------------------------------------
-        // extLink
-        // ---------------------------------------------------------
+        // -------------------------
+        // لینک خارجی
+        // -------------------------
         if (
-            web.extLink &&
-            !isSameDomain(url, web.url)
+            config.web.extLink &&
+            !isSameDomain(url, config.web.url)
         ) {
-
-            openInDefaultBrowser(url)
-
+            openExternalBrowser(url)
             return true
         }
 
-        // ---------------------------------------------------------
-        // سایر لینک‌ها:
-        // داخل WebView
-        // ---------------------------------------------------------
+        // -------------------------
+        // بقیه → داخل WebView
+        // -------------------------
         return false
     }
 
-    // =============================================================
-    // مدیریت URLهای پنجره جدید
-    // =============================================================
+    // =========================================================
+    // تشخیص browserOnly از کانفیگ app.json
+    // =========================================================
 
-    private fun handleNewWindowUrl(url: String): Boolean {
+    private fun isBrowserOnlyUrl(url: String): Boolean {
 
-        val web = config.web
-
-        // ---------------------------------------------------------
-        // browserOnly
-        // ---------------------------------------------------------
-        if (
-            matchesBrowserOnly(
-                url = url,
-                browserOnly = web.browserOnly
-            )
-        ) {
-
-            openInDefaultBrowser(url)
-
-            return true
-        }
-
-        // ---------------------------------------------------------
-        // لینک خارجی
-        // ---------------------------------------------------------
-        if (
-            web.extLink &&
-            isHttpUrl(url) &&
-            !isSameDomain(url, web.url)
-        ) {
-
-            openInDefaultBrowser(url)
-
-            return true
-        }
-
-        // ---------------------------------------------------------
-        // سایر لینک‌ها:
-        // در WebView اصلی
-        // ---------------------------------------------------------
-        if (isHttpUrl(url)) {
-
-            webView.loadUrl(url)
-
-            return true
-        }
-
-        // ---------------------------------------------------------
-        // Schemeهای دیگر
-        // ---------------------------------------------------------
-        if (web.deepLink) {
-
-            openExternalBrowserOrIntent(url)
-
-            return true
-        }
-
-        return true
-    }
-
-    // =============================================================
-    // browserOnly
-    // =============================================================
-
-    /**
-     * بررسی لینک‌های browserOnly که از JSON آمده‌اند.
-     *
-     * JSON می‌تواند یک یا چند URL داشته باشد:
-     *
-     * "https://site.com/a"
-     *
-     * یا:
-     *
-     * "https://site.com/a, https://site.com/b"
-     *
-     * تطابق کاملاً دقیق است.
-     */
-    private fun matchesBrowserOnly(
-        url: String,
-        browserOnly: String
-    ): Boolean {
+        val browserOnly =
+            config.web.browserOnly
 
         if (browserOnly.isBlank()) {
             return false
         }
+
+        val current = normalizeUrl(url)
 
         return browserOnly
             .split(",")
@@ -416,19 +289,32 @@ class WebActivity : AppCompatActivity() {
             .filter { it.isNotEmpty() }
             .any { pattern ->
 
-                url == pattern
+                val target = normalizeUrl(pattern)
+
+                // تطبیق بر اساس شروع مسیر
+                current == target ||
+                current.startsWith("$target/") ||
+                current.startsWith("$target?") ||
+                current.startsWith("$target#")
             }
     }
 
-    // =============================================================
-    // باز کردن در مرورگر پیش‌فرض
-    // =============================================================
+    // =========================================================
+    // نرمال‌سازی URL
+    // =========================================================
 
-    /**
-     * لینک را کاملاً از WebView خارج کرده و
-     * با مرورگر پیش‌فرض سیستم باز می‌کند.
-     */
-    private fun openInDefaultBrowser(url: String) {
+    private fun normalizeUrl(url: String): String {
+
+        return url
+            .trim()
+            .removeSuffix("/")
+    }
+
+    // =========================================================
+    // باز کردن مرورگر پیش‌فرض گوشی
+    // =========================================================
+
+    private fun openExternalBrowser(url: String) {
 
         try {
 
@@ -441,41 +327,14 @@ class WebActivity : AppCompatActivity() {
 
             startActivity(intent)
 
-        } catch (e: Exception) {
-
-            // اگر مرورگر پیش‌فرض قابل اجرا نبود،
-            // هیچ URLای داخل WebView باز نمی‌شود.
+        } catch (_: Exception) {
+            // مرورگر در دسترس نبود
         }
     }
 
-    // =============================================================
-    // Deep Link / Scheme
-    // =============================================================
-
-    private fun openExternalBrowserOrIntent(
-        url: String
-    ): Boolean {
-
-        return try {
-
-            val intent = Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse(url)
-            )
-
-            startActivity(intent)
-
-            true
-
-        } catch (e: Exception) {
-
-            true
-        }
-    }
-
-    // =============================================================
-    // تشخیص HTTP / HTTPS
-    // =============================================================
+    // =========================================================
+    // HTTP / HTTPS
+    // =========================================================
 
     private fun isHttpUrl(url: String): Boolean {
 
@@ -489,9 +348,9 @@ class WebActivity : AppCompatActivity() {
         )
     }
 
-    // =============================================================
+    // =========================================================
     // تشخیص دامنه
-    // =============================================================
+    // =========================================================
 
     private fun isSameDomain(
         a: String,
@@ -519,19 +378,16 @@ class WebActivity : AppCompatActivity() {
                 ignoreCase = true
             )
 
-        } catch (e: Exception) {
-
+        } catch (_: Exception) {
             false
         }
     }
 
-    // =============================================================
-    // Error Mapping
-    // =============================================================
+    // =========================================================
+    // خطاهای WebView
+    // =========================================================
 
-    private fun mapErrorCode(
-        code: Int
-    ): String {
+    private fun mapErrorCode(code: Int): String {
 
         return when (code) {
 
@@ -564,13 +420,11 @@ class WebActivity : AppCompatActivity() {
         }
     }
 
-    // =============================================================
-    // Error Activity
-    // =============================================================
+    // =========================================================
+    // صفحه خطا
+    // =========================================================
 
-    private fun gotoError(
-        type: String
-    ) {
+    private fun gotoError(type: String) {
 
         val intent =
             Intent(
@@ -588,25 +442,19 @@ class WebActivity : AppCompatActivity() {
         finish()
     }
 
-    // =============================================================
-    // Back Button
-    // =============================================================
+    // =========================================================
+    // دکمه برگشت
+    // =========================================================
 
     override fun onBackPressed() {
 
         if (config.exit.active) {
 
-            ExitDialog.show(
-                this,
-                config
-            ) {
+            ExitDialog.show(this, config) {
 
                 if (webView.canGoBack()) {
-
                     webView.goBack()
-
                 } else {
-
                     finish()
                 }
             }
@@ -615,18 +463,11 @@ class WebActivity : AppCompatActivity() {
         }
 
         if (webView.canGoBack()) {
-
             webView.goBack()
-
         } else {
-
             super.onBackPressed()
         }
     }
-
-    // =============================================================
-    // Constants
-    // =============================================================
 
     companion object {
 
