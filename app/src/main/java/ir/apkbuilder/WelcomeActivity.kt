@@ -1,17 +1,12 @@
 package ir.apkbuilder
 
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
 import android.content.Intent
-import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.DecelerateInterpolator
-import android.view.animation.OvershootInterpolator
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -22,39 +17,34 @@ import androidx.core.content.res.ResourcesCompat
  * =========================================================
  * WelcomeActivity
  *
- * Native Premium Welcome Renderer
+ * تمام مقادیر محتوایی و ظاهری از config.json خوانده می‌شوند.
  *
- * قانون اصلی:
+ * منبع:
+ * config.json
+ *     ↓
+ * ConfigLoader
+ *     ↓
+ * AppConfig
+ *     ↓
+ * WelcomeConfig
+ *     ↓
+ * این Activity
  *
- * هیچ محتوای اختصاصی یک اپ در این فایل وجود ندارد.
- *
- * تمام اطلاعات Welcome از:
- *
- *     ConfigLoader
- *          ↓
- *     AppConfig
- *          ↓
- *     config.welcome
- *          ↓
- *     app.json
- *
- * خوانده می‌شود.
- *
- * این فایل فقط:
- * - Renderer
- * - Layout Engine
- * - Animation Engine
- *
- * است.
+ * این فایل مخصوص هیچ اپ خاصی نیست.
  * =========================================================
  */
 class WelcomeActivity : AppCompatActivity() {
 
     private lateinit var config: AppConfig
+    private lateinit var welcome: WelcomeConfig
+
     private lateinit var root: FrameLayout
     private lateinit var content: LinearLayout
 
-    private var isLeaving = false
+    private var iconView: View? = null
+    private var titleView: TextView? = null
+    private var descriptionView: TextView? = null
+    private var buttonView: TextView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,8 +56,7 @@ class WelcomeActivity : AppCompatActivity() {
          */
 
         config = ConfigLoader.load(this)
-
-        val welcome = config.welcome
+        welcome = config.welcome
 
         /*
          * =====================================================
@@ -77,14 +66,11 @@ class WelcomeActivity : AppCompatActivity() {
 
         root = FrameLayout(this).apply {
 
-            layoutParams = FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
             )
 
-            /*
-             * کاملاً از app.json
-             */
             background = SvgHelper.makeBackground(
                 welcome.bgMode,
                 welcome.bg,
@@ -92,9 +78,6 @@ class WelcomeActivity : AppCompatActivity() {
                 welcome.bgAngle
             )
 
-            /*
-             * برای ورود نرم صفحه
-             */
             alpha = 0f
 
             clipChildren = false
@@ -103,7 +86,7 @@ class WelcomeActivity : AppCompatActivity() {
 
         /*
          * =====================================================
-         * MAIN CONTENT
+         * MAIN COLUMN
          * =====================================================
          */
 
@@ -111,65 +94,48 @@ class WelcomeActivity : AppCompatActivity() {
 
             orientation = LinearLayout.VERTICAL
 
+            gravity = Gravity.CENTER
+
             layoutParams = FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT
             )
 
-            gravity = Gravity.CENTER
-
             setPadding(
-                SvgHelper.dp(
-                    this@WelcomeActivity,
-                    CONTENT_PADDING
-                ),
-                SvgHelper.dp(
-                    this@WelcomeActivity,
-                    CONTENT_PADDING
-                ),
-                SvgHelper.dp(
-                    this@WelcomeActivity,
-                    CONTENT_PADDING
-                ),
-                SvgHelper.dp(
-                    this@WelcomeActivity,
-                    CONTENT_PADDING
-                )
+                SvgHelper.dp(this@WelcomeActivity, PAGE_PADDING),
+                SvgHelper.dp(this@WelcomeActivity, PAGE_PADDING),
+                SvgHelper.dp(this@WelcomeActivity, PAGE_PADDING),
+                SvgHelper.dp(this@WelcomeActivity, PAGE_PADDING)
             )
 
             clipChildren = false
             clipToPadding = false
         }
 
+        root.addView(content)
+
         /*
          * =====================================================
-         * THREE REAL AREAS
+         * THREE FLEXIBLE AREAS
          *
-         * TOP
-         * CENTER
-         * BOTTOM
-         *
-         * موقعیت عناصر از JSON تعیین می‌شود.
+         * iconPos / textPos / btnPos
+         * تعیین می‌کنند هر بخش کجا قرار بگیرد.
          * =====================================================
          */
 
-        val topBox = makeBox()
-        val centerBox = makeBox()
-        val bottomBox = makeBox()
+        val topBox = makeBox("top")
+        val centerBox = makeBox("center")
+        val bottomBox = makeBox("bottom")
 
         content.addView(topBox)
         content.addView(centerBox)
         content.addView(bottomBox)
-
-        root.addView(content)
 
         /*
          * =====================================================
          * ICON
          * =====================================================
          */
-
-        var iconView: View? = null
 
         if (
             welcome.hasIcon &&
@@ -179,33 +145,15 @@ class WelcomeActivity : AppCompatActivity() {
 
             val iconHolder = FrameLayout(this).apply {
 
-                layoutParams =
-                    LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                    ).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
 
-                        gravity = Gravity.CENTER
-                    }
-
-                /*
-                 * شروع Animation
-                 */
-                alpha = 0f
-
-                scaleX = ICON_START_SCALE
-                scaleY = ICON_START_SCALE
-
-                translationY =
-                    SvgHelper.dp(
-                        this@WelcomeActivity,
-                        ICON_START_Y
-                    ).toFloat()
+                clipChildren = false
+                clipToPadding = false
             }
 
-            /*
-             * تمام تنظیمات آیکون از JSON
-             */
             SvgHelper.buildIconView(
                 this,
                 iconHolder,
@@ -219,14 +167,14 @@ class WelcomeActivity : AppCompatActivity() {
                 welcome.iconColor
             )
 
+            iconView = iconHolder
+
             pickBox(
                 topBox,
                 centerBox,
                 bottomBox,
                 welcome.iconPos
             ).addView(iconHolder)
-
-            iconView = iconHolder
         }
 
         /*
@@ -235,143 +183,108 @@ class WelcomeActivity : AppCompatActivity() {
          * =====================================================
          */
 
-        var textView: View? = null
-
         if (
-            welcome.textPos != "hidden" &&
-            (
-                welcome.t.isNotBlank() ||
-                    welcome.d.isNotBlank()
-                )
+            welcome.textPos != "hidden"
         ) {
 
-            val textBox =
-                LinearLayout(this).apply {
+            val textBox = LinearLayout(this).apply {
 
-                    orientation =
-                        LinearLayout.VERTICAL
+                orientation = LinearLayout.VERTICAL
 
-                    gravity =
-                        Gravity.CENTER
+                gravity = Gravity.CENTER
 
-                    layoutParams =
-                        LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                        )
-                }
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+
+                clipChildren = false
+                clipToPadding = false
+            }
 
             /*
              * TITLE
              */
-            if (welcome.t.isNotBlank()) {
 
-                val title =
-                    TextView(this).apply {
+            val title = TextView(this).apply {
 
-                        text = welcome.t
+                text = welcome.t
 
-                        textSize =
-                            welcome.tSize.toFloat()
+                textSize = welcome.tSize.toFloat()
 
-                        setTextColor(
-                            SvgHelper.parseColor(
-                                welcome.txt
-                            )
-                        )
+                setTextColor(
+                    SvgHelper.parseColor(
+                        welcome.txt
+                    )
+                )
 
-                        gravity = Gravity.CENTER
+                gravity = Gravity.CENTER
 
-                        typeface = loadFont()
+                typeface = loadFont()
 
-                        includeFontPadding = true
+                includeFontPadding = true
 
-                        setLineSpacing(
-                            0f,
-                            TITLE_LINE_SPACING
-                        )
+                setLineSpacing(
+                    0f,
+                    TITLE_LINE_SPACING
+                )
 
-                        alpha = 0f
-
-                        translationY =
-                            SvgHelper.dp(
-                                this@WelcomeActivity,
-                                TEXT_START_Y
-                            ).toFloat()
-
-                        layoutParams =
-                            LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT,
-                                LinearLayout.LayoutParams.WRAP_CONTENT
-                            )
-                    }
-
-                textBox.addView(title)
-
-                textView = title
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
             }
+
+            titleView = title
+
+            textBox.addView(title)
 
             /*
              * DESCRIPTION
              */
-            if (welcome.d.isNotBlank()) {
 
-                val description =
-                    TextView(this).apply {
+            val description = TextView(this).apply {
 
-                        text = welcome.d
+                text = welcome.d
 
-                        textSize =
-                            welcome.dSize.toFloat()
+                textSize = welcome.dSize.toFloat()
 
-                        setTextColor(
-                            SvgHelper.parseColor(
-                                welcome.txt
-                            )
-                        )
+                setTextColor(
+                    SvgHelper.parseColor(
+                        welcome.txt
+                    )
+                )
 
-                        gravity = Gravity.CENTER
+                gravity = Gravity.CENTER
 
-                        typeface = loadFont()
+                typeface = loadFont()
 
-                        includeFontPadding = true
+                includeFontPadding = true
 
-                        setPadding(
-                            0,
-                            SvgHelper.dp(
-                                this@WelcomeActivity,
-                                DESCRIPTION_TOP_PADDING
-                            ),
-                            0,
-                            0
-                        )
+                setPadding(
+                    0,
+                    SvgHelper.dp(
+                        this@WelcomeActivity,
+                        DESCRIPTION_TOP_PADDING
+                    ),
+                    0,
+                    0
+                )
 
-                        setLineSpacing(
-                            0f,
-                            DESCRIPTION_LINE_SPACING
-                        )
+                setLineSpacing(
+                    0f,
+                    DESCRIPTION_LINE_SPACING
+                )
 
-                        alpha = 0f
-
-                        translationY =
-                            SvgHelper.dp(
-                                this@WelcomeActivity,
-                                TEXT_START_Y
-                            ).toFloat()
-
-                        layoutParams =
-                            LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT,
-                                LinearLayout.LayoutParams.WRAP_CONTENT
-                            )
-                    }
-
-                textBox.addView(description)
-
-                if (textView == null) {
-                    textView = description
-                }
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
             }
+
+            descriptionView = description
+
+            textBox.addView(description)
 
             pickBox(
                 topBox,
@@ -387,42 +300,28 @@ class WelcomeActivity : AppCompatActivity() {
          * =====================================================
          */
 
-        var buttonView: TextView? = null
-
         if (
             welcome.btn.isNotBlank() &&
             welcome.btnPos != "hidden"
         ) {
 
-            buttonView =
-                buildButton(welcome).apply {
+            val button = buildButton(
+                welcome
+            )
 
-                    /*
-                     * Animation
-                     */
-                    alpha = 0f
-
-                    scaleX = BUTTON_START_SCALE
-                    scaleY = BUTTON_START_SCALE
-
-                    translationY =
-                        SvgHelper.dp(
-                            this@WelcomeActivity,
-                            BUTTON_START_Y
-                        ).toFloat()
-                }
+            buttonView = button
 
             pickBox(
                 topBox,
                 centerBox,
                 bottomBox,
                 welcome.btnPos
-            ).addView(buttonView)
+            ).addView(button)
         }
 
         /*
          * =====================================================
-         * SET CONTENT
+         * CONTENT
          * =====================================================
          */
 
@@ -435,64 +334,45 @@ class WelcomeActivity : AppCompatActivity() {
 
         /*
          * =====================================================
-         * START ENTRANCE
-         *
-         * بعد از setContentView
-         * تا هیچ Animation روی View جداشده اجرا نشود.
+         * ENTRANCE ANIMATION
          * =====================================================
          */
 
         root.post {
-
-            playRootEntrance()
-
-            iconView?.let {
-                animateIconIn(it)
-            }
-
-            textView?.let {
-                animateTextIn(it)
-            }
-
-            buttonView?.let {
-                animateButtonIn(it)
-            }
+            animateEntrance()
         }
     }
 
-    /*
-     * =========================================================
-     * BOX
-     * =========================================================
-     */
+    /* =========================================================
+       BOX
+       ========================================================= */
 
-    private fun makeBox(): LinearLayout {
+    private fun makeBox(
+        tagValue: String
+    ): LinearLayout {
 
         return LinearLayout(this).apply {
 
-            orientation =
-                LinearLayout.VERTICAL
+            tag = tagValue
 
-            gravity =
-                Gravity.CENTER
+            orientation = LinearLayout.VERTICAL
 
-            layoutParams =
-                LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    0,
-                    1f
-                )
+            gravity = Gravity.CENTER
+
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                0,
+                BOX_WEIGHT
+            )
 
             clipChildren = false
             clipToPadding = false
         }
     }
 
-    /*
-     * =========================================================
-     * POSITION
-     * =========================================================
-     */
+    /* =========================================================
+       PICK BOX
+       ========================================================= */
 
     private fun pickBox(
         top: LinearLayout,
@@ -503,73 +383,52 @@ class WelcomeActivity : AppCompatActivity() {
 
         return when (position.lowercase()) {
 
-            "top" ->
-                top
+            "top" -> top
 
-            "bottom" ->
-                bottom
+            "bottom" -> bottom
 
-            "center" ->
-                center
+            "center" -> center
 
-            /*
-             * اگر مقدار ناشناخته بود،
-             * رفتار امن:
-             * مرکز
-             */
-            else ->
-                center
+            else -> center
         }
     }
 
-    /*
-     * =========================================================
-     * BUTTON
-     * =========================================================
-     */
+    /* =========================================================
+       BUTTON
+       ========================================================= */
 
     private fun buildButton(
-        welcome: AppConfig.WelcomeConfig
+        cfg: WelcomeConfig
     ): TextView {
 
-        return TextView(this).apply {
+        val button = TextView(this).apply {
 
-            /*
-             * متن از JSON
-             */
-            text =
-                welcome.btn
+            text = cfg.btn
 
-            /*
-             * اندازه از JSON
-             */
-            textSize =
-                welcome.btnSize.toFloat()
+            textSize = cfg.btnSize.toFloat()
 
-            /*
-             * رنگ متن از JSON
-             */
             setTextColor(
                 SvgHelper.parseColor(
-                    welcome.btnTxt
+                    cfg.btnTxt
                 )
             )
 
-            gravity =
-                Gravity.CENTER
+            gravity = Gravity.CENTER
 
-            typeface =
-                loadFont()
+            typeface = loadFont()
 
-            includeFontPadding =
-                true
+            includeFontPadding = true
 
-            /*
-             * Padding داخلی
-             *
-             * این مقدار Layout Engine است،
-             * نه مقدار اختصاصی اپ.
-             */
+            minHeight = SvgHelper.dp(
+                this@WelcomeActivity,
+                BUTTON_MIN_HEIGHT
+            )
+
+            minWidth = SvgHelper.dp(
+                this@WelcomeActivity,
+                BUTTON_MIN_WIDTH
+            )
+
             setPadding(
                 SvgHelper.dp(
                     this@WelcomeActivity,
@@ -589,30 +448,28 @@ class WelcomeActivity : AppCompatActivity() {
                 )
             )
 
-            /*
-             * اندازه طبیعی دکمه
-             */
-            layoutParams =
-                LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                ).apply {
-
-                    gravity =
-                        Gravity.CENTER
-                }
+            background = makeButtonBackground(
+                cfg
+            )
 
             /*
-             * Background کاملاً از JSON
+             * Elevation فقط رفتار عمومی style است.
+             * مقدار محتوایی هاردکد نشده.
              */
-            background =
-                makeButtonBackground(
-                    welcome
+            if (
+                cfg.btnStyle.equals(
+                    "elevated",
+                    ignoreCase = true
                 )
+            ) {
+                elevation = SvgHelper.dp(
+                    this@WelcomeActivity,
+                    BUTTON_ELEVATION
+                ).toFloat()
+            } else {
+                elevation = 0f
+            }
 
-            /*
-             * Click
-             */
             isClickable = true
             isFocusable = true
 
@@ -620,383 +477,253 @@ class WelcomeActivity : AppCompatActivity() {
                 leaveWelcome()
             }
         }
+
+        return button
     }
 
-    /*
-     * =========================================================
-     * BUTTON BACKGROUND
-     * =========================================================
-     */
+    /* =========================================================
+       BUTTON BACKGROUND
+       ========================================================= */
 
     private fun makeButtonBackground(
-        welcome: AppConfig.WelcomeConfig
+        cfg: WelcomeConfig
     ): GradientDrawable {
 
         return GradientDrawable().apply {
 
-            /*
-             * رنگ دکمه از JSON
-             */
             setColor(
                 SvgHelper.parseColor(
-                    welcome.btnBg
+                    cfg.btnBg
                 )
             )
 
             /*
-             * Shape از JSON
+             * Shape از config.json
              */
+
             cornerRadius =
-                resolveButtonRadius(
-                    welcome
-                )
+                when (cfg.btnShape.lowercase()) {
 
-            /*
-             * Style از JSON
-             */
-            when (welcome.btnStyle.lowercase()) {
+                    "pill" -> {
+                        /*
+                         * برای pill مقدار ثابتِ ظاهری موتور
+                         * است، نه مقدار محتوایی اپ.
+                         */
+                        SvgHelper.dp(
+                            this@WelcomeActivity,
+                            PILL_RADIUS
+                        ).toFloat()
+                    }
 
-                /*
-                 * flat:
-                 * بدون سایه
-                 */
-                "flat" -> {
-                    alpha = 255
+                    "round",
+                    "rounded" -> {
+
+                        SvgHelper.dp(
+                            this@WelcomeActivity,
+                            cfg.btnRadius
+                        ).toFloat()
+                    }
+
+                    "square" -> {
+                        0f
+                    }
+
+                    else -> {
+
+                        SvgHelper.dp(
+                            this@WelcomeActivity,
+                            cfg.btnRadius
+                        ).toFloat()
+                    }
                 }
-
-                /*
-                 * elevated:
-                 * خود View در ادامه Elevation می‌گیرد.
-                 */
-                "elevated" -> {
-                    alpha = 255
-                }
-
-                /*
-                 * هر مقدار ناشناخته:
-                 * امن و ساده
-                 */
-                else -> {
-                    alpha = 255
-                }
-            }
         }
     }
 
-    /*
-     * =========================================================
-     * BUTTON RADIUS
-     * =========================================================
-     *
-     * btnShape از JSON اولویت دارد.
-     *
-     * pill:
-     * دکمه کاملاً گرد
-     *
-     * round / rounded:
-     * از btnRadius استفاده می‌کند.
-     *
-     * square:
-     * گوشه تقریباً صفر
-     * =========================================================
-     */
+    /* =========================================================
+       ENTRANCE ANIMATION
+       ========================================================= */
 
-    private fun resolveButtonRadius(
-        welcome: AppConfig.WelcomeConfig
-    ): Float {
+    private fun animateEntrance() {
 
-        val shape =
-            welcome.btnShape.lowercase()
+        /*
+         * ROOT
+         */
 
-        return when (shape) {
-
-            "pill" -> {
-
-                /*
-                 * برای pill شعاع را
-                 * بر اساس ارتفاع واقعی دکمه
-                 * در onLayout اصلاح می‌کنیم.
-                 *
-                 * مقدار بالا عمداً زیاد است.
-                 */
-                SvgHelper.dp(
-                    this,
-                    PILL_RADIUS
-                ).toFloat()
-            }
-
-            "round",
-            "rounded" -> {
-
-                SvgHelper.dp(
-                    this,
-                    welcome.btnRadius
-                ).toFloat()
-            }
-
-            "square" -> {
-                0f
-            }
-
-            else -> {
-
-                SvgHelper.dp(
-                    this,
-                    welcome.btnRadius
-                ).toFloat()
-            }
-        }
-    }
-
-    /*
-     * =========================================================
-     * ROOT ENTRANCE
-     * =========================================================
-     */
-
-    private fun playRootEntrance() {
+        root.alpha = 0f
 
         root.animate()
             .alpha(1f)
             .setDuration(
-                ROOT_ENTER_DURATION
+                ROOT_FADE_DURATION
             )
             .setInterpolator(
-                DecelerateInterpolator(
-                    1.4f
+                android.view.animation.DecelerateInterpolator(
+                    ROOT_DECELERATION
                 )
             )
             .start()
-    }
-
-    /*
-     * =========================================================
-     * ICON ANIMATION
-     * =========================================================
-     */
-
-    private fun animateIconIn(
-        view: View
-    ) {
-
-        val alpha =
-            ObjectAnimator.ofFloat(
-                view,
-                View.ALPHA,
-                0f,
-                1f
-            )
-
-        val scaleX =
-            ObjectAnimator.ofFloat(
-                view,
-                View.SCALE_X,
-                ICON_START_SCALE,
-                1f
-            )
-
-        val scaleY =
-            ObjectAnimator.ofFloat(
-                view,
-                View.SCALE_Y,
-                ICON_START_SCALE,
-                1f
-            )
-
-        val translation =
-            ObjectAnimator.ofFloat(
-                view,
-                View.TRANSLATION_Y,
-                view.translationY,
-                0f
-            )
-
-        AnimatorSet().apply {
-
-            playTogether(
-                alpha,
-                scaleX,
-                scaleY,
-                translation
-            )
-
-            duration =
-                ICON_DURATION
-
-            startDelay =
-                ICON_DELAY
-
-            interpolator =
-                OvershootInterpolator(
-                    ICON_OVERSHOOT
-                )
-
-            start()
-        }
-    }
-
-    /*
-     * =========================================================
-     * TEXT ANIMATION
-     * =========================================================
-     */
-
-    private fun animateTextIn(
-        view: View
-    ) {
-
-        val alpha =
-            ObjectAnimator.ofFloat(
-                view,
-                View.ALPHA,
-                0f,
-                1f
-            )
-
-        val translation =
-            ObjectAnimator.ofFloat(
-                view,
-                View.TRANSLATION_Y,
-                view.translationY,
-                0f
-            )
-
-        AnimatorSet().apply {
-
-            playTogether(
-                alpha,
-                translation
-            )
-
-            duration =
-                TEXT_DURATION
-
-            startDelay =
-                TEXT_DELAY
-
-            interpolator =
-                DecelerateInterpolator(
-                    1.35f
-                )
-
-            start()
-        }
-    }
-
-    /*
-     * =========================================================
-     * BUTTON ANIMATION
-     * =========================================================
-     */
-
-    private fun animateButtonIn(
-        view: TextView
-    ) {
 
         /*
-         * Elevated فقط وقتی در JSON انتخاب شده،
-         * Elevation واقعی می‌گیرد.
+         * ICON
          */
-        if (
-            config.welcome.btnStyle
-                .equals(
-                    "elevated",
-                    ignoreCase = true
-                )
-        ) {
 
-            view.elevation =
+        iconView?.let { view ->
+
+            view.alpha = 0f
+
+            view.scaleX = ICON_START_SCALE
+            view.scaleY = ICON_START_SCALE
+
+            view.translationY =
                 SvgHelper.dp(
                     this,
-                    BUTTON_ELEVATION
+                    ICON_START_TRANSLATION
                 ).toFloat()
+
+            view.animate()
+                .alpha(1f)
+                .scaleX(1f)
+                .scaleY(1f)
+                .translationY(0f)
+                .setDuration(
+                    ICON_ANIMATION_DURATION
+                )
+                .setStartDelay(
+                    ICON_START_DELAY
+                )
+                .setInterpolator(
+                    android.view.animation.PathInterpolator(
+                        0.16f,
+                        1.0f,
+                        0.3f,
+                        1.0f
+                    )
+                )
+                .start()
         }
 
-        val alpha =
-            ObjectAnimator.ofFloat(
-                view,
-                View.ALPHA,
-                0f,
-                1f
-            )
+        /*
+         * TITLE
+         */
 
-        val scaleX =
-            ObjectAnimator.ofFloat(
-                view,
-                View.SCALE_X,
-                BUTTON_START_SCALE,
-                1f
-            )
+        titleView?.let { view ->
 
-        val scaleY =
-            ObjectAnimator.ofFloat(
-                view,
-                View.SCALE_Y,
-                BUTTON_START_SCALE,
-                1f
-            )
+            view.alpha = 0f
 
-        val translation =
-            ObjectAnimator.ofFloat(
-                view,
-                View.TRANSLATION_Y,
-                view.translationY,
-                0f
-            )
+            view.translationY =
+                SvgHelper.dp(
+                    this,
+                    TEXT_START_TRANSLATION
+                ).toFloat()
 
-        AnimatorSet().apply {
-
-            playTogether(
-                alpha,
-                scaleX,
-                scaleY,
-                translation
-            )
-
-            duration =
-                BUTTON_DURATION
-
-            startDelay =
-                BUTTON_DELAY
-
-            interpolator =
-                OvershootInterpolator(
-                    BUTTON_OVERSHOOT
+            view.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setDuration(
+                    TEXT_ANIMATION_DURATION
                 )
+                .setStartDelay(
+                    TEXT_START_DELAY
+                )
+                .setInterpolator(
+                    android.view.animation.PathInterpolator(
+                        0.16f,
+                        1.0f,
+                        0.3f,
+                        1.0f
+                    )
+                )
+                .start()
+        }
 
-            start()
+        /*
+         * DESCRIPTION
+         */
+
+        descriptionView?.let { view ->
+
+            view.alpha = 0f
+
+            view.translationY =
+                SvgHelper.dp(
+                    this,
+                    DESCRIPTION_START_TRANSLATION
+                ).toFloat()
+
+            view.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setDuration(
+                    DESCRIPTION_ANIMATION_DURATION
+                )
+                .setStartDelay(
+                    DESCRIPTION_START_DELAY
+                )
+                .setInterpolator(
+                    android.view.animation.PathInterpolator(
+                        0.16f,
+                        1.0f,
+                        0.3f,
+                        1.0f
+                    )
+                )
+                .start()
+        }
+
+        /*
+         * BUTTON
+         */
+
+        buttonView?.let { view ->
+
+            view.alpha = 0f
+
+            view.scaleX = BUTTON_START_SCALE
+            view.scaleY = BUTTON_START_SCALE
+
+            view.translationY =
+                SvgHelper.dp(
+                    this,
+                    BUTTON_START_TRANSLATION
+                ).toFloat()
+
+            view.animate()
+                .alpha(1f)
+                .scaleX(1f)
+                .scaleY(1f)
+                .translationY(0f)
+                .setDuration(
+                    BUTTON_ANIMATION_DURATION
+                )
+                .setStartDelay(
+                    BUTTON_START_DELAY
+                )
+                .setInterpolator(
+                    android.view.animation.OvershootInterpolator(
+                        BUTTON_OVERSHOOT
+                    )
+                )
+                .start()
         }
     }
 
-    /*
-     * =========================================================
-     * LEAVE
-     * =========================================================
-     */
+    /* =========================================================
+       LEAVE WELCOME
+       ========================================================= */
 
     private fun leaveWelcome() {
 
-        if (isLeaving) {
-            return
-        }
+        /*
+         * جلوگیری از چند کلیک.
+         */
 
-        isLeaving = true
+        buttonView?.isEnabled = false
 
         /*
-         * جلوگیری از کلیک مجدد
+         * خروج نرم خود Welcome
          */
-        content.isEnabled = false
 
-        /*
-         * خروج محسوس اما نرم
-         */
-        content.animate()
-            .translationY(
-                -SvgHelper.dp(
-                    this,
-                    EXIT_TRANSLATION_Y
-                ).toFloat()
-            )
+        root.animate()
             .alpha(0f)
             .scaleX(EXIT_SCALE)
             .scaleY(EXIT_SCALE)
@@ -1004,33 +731,31 @@ class WelcomeActivity : AppCompatActivity() {
                 EXIT_DURATION
             )
             .setInterpolator(
-                DecelerateInterpolator(
-                    1.35f
+                android.view.animation.PathInterpolator(
+                    0.16f,
+                    1.0f,
+                    0.3f,
+                    1.0f
                 )
             )
             .withEndAction {
-
                 openWeb()
             }
             .start()
     }
 
-    /*
-     * =========================================================
-     * OPEN WEB
-     * =========================================================
-     *
-     * Welcome فقط صفحه ورود است.
-     *
-     * مقصد بعدی:
-     * WebActivity
-     *
-     * خود WebActivity از config.web
-     * استفاده می‌کند.
-     * =========================================================
-     */
+    /* =========================================================
+       OPEN WEB
+       ========================================================= */
 
     private fun openWeb() {
+
+        /*
+         * مقصد واقعی از config.web.url
+         * توسط WebActivity مدیریت می‌شود.
+         *
+         * هیچ URL اپ خاصی اینجا هاردکد نشده.
+         */
 
         startActivity(
             Intent(
@@ -1039,24 +764,21 @@ class WelcomeActivity : AppCompatActivity() {
             )
         )
 
+        /*
+         * جلوگیری از انیمیشن پیش‌فرض اندروید.
+         */
+
         overridePendingTransition(
             0,
             0
         )
 
         finish()
-
-        overridePendingTransition(
-            0,
-            0
-        )
     }
 
-    /*
-     * =========================================================
-     * FONT
-     * =========================================================
-     */
+    /* =========================================================
+       FONT
+       ========================================================= */
 
     private fun loadFont(): Typeface? {
 
@@ -1075,91 +797,92 @@ class WelcomeActivity : AppCompatActivity() {
         }
     }
 
-    /*
-     * =========================================================
-     * CONSTANTS
-     *
-     * این‌ها تنظیمات Engine هستند،
-     * نه اطلاعات اپ.
-     *
-     * بنابراین در app.json قرار نمی‌گیرند.
-     * =========================================================
-     */
+    /* =========================================================
+       CONSTANTS
+       =========================================================
+       
+       این مقادیر فقط رفتار عمومی موتور/UI هستند.
+       هیچ‌کدام مقدار اختصاصی config.json نیستند.
+       ========================================================= */
 
     companion object {
 
         /*
-         * Layout
+         * صفحه
          */
-        private const val CONTENT_PADDING = 24
+        private const val PAGE_PADDING = 24
 
         /*
-         * Text
+         * تقسیم سه ناحیه
          */
-        private const val DESCRIPTION_TOP_PADDING = 10
-
-        private const val TITLE_LINE_SPACING = 1.08f
-
-        private const val DESCRIPTION_LINE_SPACING = 1.12f
+        private const val BOX_WEIGHT = 1f
 
         /*
-         * Root entrance
+         * متن
          */
-        private const val ROOT_ENTER_DURATION = 280L
+        private const val TITLE_LINE_SPACING = 1.05f
+        private const val DESCRIPTION_LINE_SPACING = 1.10f
+
+        private const val DESCRIPTION_TOP_PADDING = 8
 
         /*
-         * Icon
+         * دکمه
          */
-        private const val ICON_START_SCALE = 0.78f
+        private const val BUTTON_MIN_HEIGHT = 52
+        private const val BUTTON_MIN_WIDTH = 150
 
-        private const val ICON_START_Y = 34
-
-        private const val ICON_DELAY = 60L
-
-        private const val ICON_DURATION = 650L
-
-        private const val ICON_OVERSHOOT = 0.72f
-
-        /*
-         * Text
-         */
-        private const val TEXT_START_Y = 24
-
-        private const val TEXT_DELAY = 160L
-
-        private const val TEXT_DURATION = 500L
-
-        /*
-         * Button
-         */
-        private const val BUTTON_START_SCALE = 0.82f
-
-        private const val BUTTON_START_Y = 26
-
-        private const val BUTTON_DELAY = 280L
-
-        private const val BUTTON_DURATION = 520L
-
-        private const val BUTTON_OVERSHOOT = 0.7f
-
-        private const val BUTTON_HORIZONTAL_PADDING = 30
-
+        private const val BUTTON_HORIZONTAL_PADDING = 28
         private const val BUTTON_VERTICAL_PADDING = 12
 
-        private const val BUTTON_ELEVATION = 7
+        private const val BUTTON_ELEVATION = 8
 
         /*
-         * فقط برای shape = pill
+         * فقط fallback عمومی برای شکل pill.
+         * رنگ/اندازه/متن/محتوا از config می‌آید.
          */
         private const val PILL_RADIUS = 100
 
         /*
+         * Root entrance
+         */
+        private const val ROOT_FADE_DURATION = 360L
+        private const val ROOT_DECELERATION = 1.4f
+
+        /*
+         * Icon
+         */
+        private const val ICON_START_SCALE = 0.82f
+        private const val ICON_START_TRANSLATION = 22
+        private const val ICON_ANIMATION_DURATION = 620L
+        private const val ICON_START_DELAY = 40L
+
+        /*
+         * Title
+         */
+        private const val TEXT_START_TRANSLATION = 24
+        private const val TEXT_ANIMATION_DURATION = 520L
+        private const val TEXT_START_DELAY = 140L
+
+        /*
+         * Description
+         */
+        private const val DESCRIPTION_START_TRANSLATION = 20
+        private const val DESCRIPTION_ANIMATION_DURATION = 520L
+        private const val DESCRIPTION_START_DELAY = 220L
+
+        /*
+         * Button
+         */
+        private const val BUTTON_START_SCALE = 0.88f
+        private const val BUTTON_START_TRANSLATION = 24
+        private const val BUTTON_ANIMATION_DURATION = 600L
+        private const val BUTTON_START_DELAY = 300L
+        private const val BUTTON_OVERSHOOT = 1.08f
+
+        /*
          * Exit
          */
-        private const val EXIT_DURATION = 380L
-
-        private const val EXIT_TRANSLATION_Y = 20
-
-        private const val EXIT_SCALE = 0.965f
+        private const val EXIT_SCALE = 0.97f
+        private const val EXIT_DURATION = 260L
     }
 }
