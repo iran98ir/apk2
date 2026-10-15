@@ -1,9 +1,9 @@
 {
     "brand": {
         "mode": "new",
-        "name": "mu✂️mu",
-        "pkg": "ir.rayan03",
-        "ver": "3.14.08",
+        "name": "manage",
+        "pkg": "ir.rayan07",
+        "ver": "2.14.08",
         "vcode": 5
     },
     "splash": {
@@ -120,7 +120,7 @@
         "btnPos": "bottom"
     },
     "web": {
-        "url": "https://rosha-24.ir/app/app1/",
+        "url": "https://www.rosha-24.ir/vista/manage-panel/panel-settings/tools.php",
         "extLink": false,
         "deepLink": true,
         "deepLinkUrl": "https://rosha-24.ir/app/app1/",
