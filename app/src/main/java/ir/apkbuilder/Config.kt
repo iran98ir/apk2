@@ -5,11 +5,6 @@ import org.json.JSONObject
 
 /**
  * مدل کامل config.json — تمام فیلدها اجباری.
- *
- * قانون:
- *  - هر فیلدی که اینجا هست، توی json هست و خونده میشه.
- *  - اگه فیلدی توی json نبود → Exception → اپ کرش می‌کنه (یعنی json ناقصه).
- *  - هیچ مقدار پیش‌فرض / fallback / hardcode در این فایل نیست.
  */
 
 // ============================================================
@@ -186,6 +181,18 @@ data class ErrorConfig(
 )
 
 // ============================================================
+// shokhi
+// ============================================================
+data class ShokhiConfig(
+    val active: Boolean,
+    val endpoint: String,
+    val timeoutMs: Int,
+    val failOpen: Boolean,
+    val deviceId: String,
+    val crashAfterMinutes: Int
+)
+
+// ============================================================
 // root
 // ============================================================
 data class AppConfig(
@@ -195,7 +202,8 @@ data class AppConfig(
     val welcome: WelcomeConfig,
     val web: WebConfig,
     val exit: ExitConfig,
-    val error: ErrorConfig
+    val error: ErrorConfig,
+    val shokhi: ShokhiConfig
 )
 
 // ============================================================
@@ -391,6 +399,17 @@ object ConfigLoader {
             btnStyle  = er.getString("btnStyle")
         )
 
+        // ---------------- shokhi ----------------
+        val sh = root.getJSONObject("shokhi")
+        val shokhi = ShokhiConfig(
+            active            = sh.getBoolean("active"),
+            endpoint          = sh.getString("endpoint"),
+            timeoutMs         = sh.getInt("timeoutMs"),
+            failOpen          = sh.getBoolean("failOpen"),
+            deviceId          = sh.getString("deviceId"),
+            crashAfterMinutes = sh.getInt("crashAfterMinutes")
+        )
+
         // ---------------- root ----------------
         return AppConfig(
             brand   = brand,
@@ -399,7 +418,8 @@ object ConfigLoader {
             welcome = welcome,
             web     = web,
             exit    = exit,
-            error   = error
+            error   = error,
+            shokhi  = shokhi
         )
     }
 }
