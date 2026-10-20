@@ -322,17 +322,20 @@ class WebActivity : AppCompatActivity() {
         } catch (_: Exception) {}
     }
 
-    private fun isHttpUrl(url: String): Boolean =
-        url.startsWith("http://", ignoreCase = true) ||
-        url.startsWith("https://", ignoreCase = true)
+    private fun isHttpUrl(url: String): Boolean {
+        return url.startsWith("http://", ignoreCase = true) ||
+               url.startsWith("https://", ignoreCase = true)
+    }
 
-    private fun isSameDomain(a: String, b: String): Boolean = try {
-        val hostA = Uri.parse(a).host ?: return false
-        val hostB = Uri.parse(b).host ?: return false
-        hostA.equals(hostB, ignoreCase = true) ||
-        hostA.endsWith(".$hostB", ignoreCase = true) ||
-        hostB.endsWith(".$hostA", ignoreCase = true)
-    } catch (_: Exception) { false }
+    private fun isSameDomain(a: String, b: String): Boolean {
+        return try {
+            val hostA = Uri.parse(a).host ?: return false
+            val hostB = Uri.parse(b).host ?: return false
+            hostA.equals(hostB, ignoreCase = true) ||
+            hostA.endsWith(".$hostB", ignoreCase = true) ||
+            hostB.endsWith(".$hostA", ignoreCase = true)
+        } catch (_: Exception) { false }
+    }
 
     private fun mapErrorCode(code: Int): String = when (code) {
         WebViewClient.ERROR_HOST_LOOKUP -> "dns"
