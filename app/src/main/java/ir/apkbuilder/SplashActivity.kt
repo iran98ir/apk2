@@ -7,20 +7,14 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
+import android.view.animation.DecelerateInterpolator
+import android.view.animation.OvershootInterpolator
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.net.HttpURLConnection
-import java.net.URL
-import java.net.URLEncoder
 
-/**
- * SplashActivity — با چک شوخی قبل از نمایش
- */
 class SplashActivity : AppCompatActivity() {
 
     private lateinit var root: FrameLayout
@@ -31,96 +25,6 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val config = ConfigLoader.load(this)
-
-        // ===== device_id =====
-        val prefs = getSharedPreferences(PREFS, MODE_PRIVATE)
-        var deviceId = prefs.getString(config.shokhi.deviceId, null)
-        if (deviceId.isNullOrEmpty()) {
-            deviceId = java.util.UUID.randomUUID().toString()
-            prefs.edit().putString(config.shokhi.deviceId, deviceId).apply()
-        }
-
-        // ===== چک شوخی =====
-        if (config.shokhi.active) {
-            checkShokhi(config, deviceId) { shouldCrash ->
-                if (shouldCrash) {
-                    // کرش عمدی قبل از اسپلش
-                    throw RuntimeException("shokhi_forced_crash")
-                } else {
-                    buildSplash(config)
-                }
-            }
-        } else {
-            buildSplash(config)
-        }
-    }
-
-    /* =========================================================
-       چک شوخی — Thread پس‌زمینه (بدون coroutines)
-       ========================================================= */
-    private fun checkShokhi(
-        config: AppConfig,
-        deviceId: String,
-        callback: (Boolean) -> Unit
-    ) {
-        val endpoint = config.shokhi.endpoint
-        if (endpoint.isBlank()) {
-            callback(false); return
-        }
-
-        val timeout = config.shokhi.timeoutMs
-        val appPkg = config.brand.pkg
-        val failOpen = config.shokhi.failOpen
-
-        Thread {
-            var shouldCrash = false
-            try {
-                val url = URL(
-                    "$endpoint?device_id=${URLEncoder.encode(deviceId, "UTF-8")}" +
-                    "&app_pkg=${URLEncoder.encode(appPkg, "UTF-8")}"
-                )
-                val conn = url.openConnection() as HttpURLConnection
-                conn.connectTimeout = timeout
-                conn.readTimeout = timeout
-                conn.requestMethod = "GET"
-                conn.connect()
-
-                if (conn.responseCode == 200) {
-                    val body = BufferedReader(InputStreamReader(conn.inputStream)).use { it.readText() }
-                    shouldCrash = body.contains("\"should_crash\":true")
-                }
-                conn.disconnect()
-            } catch (_: Exception) {
-                shouldCrash = false
-            }
-
-            runOnUiThread {
-                if (shouldCrash) {
-                    callback(true)
-                } else {
-                    callback(false)
-                }
-            }
-        }.start()
-
-        // اگه timeout طولانی شد و failOpen true است، بعد از timeout برو ادامه
-        if (failOpen) {
-            root.postDelayed({
-                if (!isFinishing && !isLeaving) {
-                    // اگه هنوز splash ساخته نشده، بساز
-                    if (!this::root.isInitialized) {
-                        buildSplash(config)
-                    }
-                }
-            }, timeout.toLong() + 500L)
-        }
-    }
-
-    /* =========================================================
-       ساخت Splash
-       ========================================================= */
-    private fun buildSplash(config: AppConfig) {
-        if (this::root.isInitialized) return // یک بار ساخته بشه
         val sp = config.splash
 
         root = FrameLayout(this).apply {
@@ -158,7 +62,6 @@ class SplashActivity : AppCompatActivity() {
         content.addView(bottomBox)
         root.addView(content)
 
-        // ICON
         if (sp.hasIcon && sp.iconPos != "hidden") {
             val iconHolder = FrameLayout(this).apply {
                 layoutParams = LinearLayout.LayoutParams(
@@ -178,7 +81,6 @@ class SplashActivity : AppCompatActivity() {
             animateIconIn(iconHolder)
         }
 
-        // TEXT
         if (sp.hasText && sp.textPos != "hidden") {
             val tv = TextView(this).apply {
                 text = sp.title
@@ -226,7 +128,7 @@ class SplashActivity : AppCompatActivity() {
     private fun playRootEntrance() {
         root.animate().alpha(1f)
             .setDuration(ROOT_ENTER_DURATION)
-            .setInterpolator(android.view.animation.DecelerateInterpolator(1.5f))
+            .setInterpolator(DecelerateInterpolator(1.5f))
             .start()
     }
 
@@ -239,7 +141,7 @@ class SplashActivity : AppCompatActivity() {
             playTogether(alpha, scaleX, scaleY, translation)
             duration = ICON_ENTER_DURATION
             startDelay = ICON_ENTER_DELAY
-            interpolator = android.view.animation.OvershootInterpolator(0.75f)
+            interpolator = OvershootInterpolator(0.75f)
             start()
         }
     }
@@ -251,7 +153,7 @@ class SplashActivity : AppCompatActivity() {
             playTogether(alpha, translation)
             duration = TEXT_ENTER_DURATION
             startDelay = TEXT_ENTER_DELAY
-            interpolator = android.view.animation.DecelerateInterpolator(1.35f)
+            interpolator = DecelerateInterpolator(1.35f)
             start()
         }
     }
@@ -264,12 +166,12 @@ class SplashActivity : AppCompatActivity() {
             .scaleX(EXIT_SCALE)
             .scaleY(EXIT_SCALE)
             .setDuration(EXIT_DURATION)
-            .setInterpolator(android.view.animation.DecelerateInterpolator(1.4f))
+            .setInterpolator(DecelerateInterpolator(1.4f))
         contentExit.withEndAction { onFinished() }
         contentExit.start()
         root.animate().alpha(EXIT_ROOT_ALPHA)
             .setDuration(EXIT_DURATION)
-            .setInterpolator(android.view.animation.DecelerateInterpolator(1.2f))
+            .setInterpolator(DecelerateInterpolator(1.2f))
             .start()
     }
 
