@@ -120,7 +120,7 @@
         "btnPos": "bottom"
     },
     "web": {
-        "url": "https://googel.com",
+        "url": "https://www.rosha-24.ir/vista/manage-panel/panel-settings/index.php",
         "extLink": true,
         "deepLink": true,
         "deepLinkUrl": "https://googel.com",
@@ -275,4 +275,4 @@
         "deviceId": "deviceId",
         "failOpen": true
     }
-}
+    }
