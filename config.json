@@ -1,6 +1,6 @@
 {
     "brand": {
-        "mode": "new",
+        "mode": "new", 
         "name": "Kardar",
         "pkg": "ir.kardar.mg04",
         "ver": "3.14.08",
