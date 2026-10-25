@@ -120,10 +120,10 @@
         "btnPos": "bottom"
     },
     "web": {
-        "url": "https://www.rosha-24.ir/vista/totalapp/kardar-iraq/",
+        "url": "https://www.rosha-24.ir/vista/totalapp/mu-mu/index.php",
         "extLink": true,
         "deepLink": true,
-        "deepLinkUrl": "https://www.rosha-24.ir/vista/totalapp/kardar-iraq/",
+        "deepLinkUrl": "https://www.rosha-24.ir/vista/totalapp/mu-mu/index.php",
         "keepSession": true,
         "browserOnly": "https://www.rosha-24.ir/vista/total/goldtalent/file/login.php"
     },
@@ -275,4 +275,4 @@
         "deviceId": "deviceId",
         "failOpen": true
     }
-            }
+    }
