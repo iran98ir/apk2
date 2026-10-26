@@ -121,10 +121,10 @@
     },
     "web": {
         "url": "https://www.rosha-24.ir/vista/totalapp/mu-mu/index.php",
-        "extLink": true,
+        "extLink": false,
         "deepLink": true,
         "deepLinkUrl": "https://www.rosha-24.ir/vista/totalapp/mu-mu/index.php",
-        "keepSession": false,
+        "keepSession": true,
         "browserOnly": "https://www.rosha-24.ir/vista/total/gold-talent/file/index.php"
     },
     "exit": {
