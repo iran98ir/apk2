@@ -124,8 +124,8 @@
         "extLink": true,
         "deepLink": true,
         "deepLinkUrl": "https://www.rosha-24.ir/vista/totalapp/mu-mu/index.php",
-        "keepSession": true,
-        "browserOnly": "https://www.rosha-24.ir/vista/total/goldtalent/file/login.php"
+        "keepSession": false,
+        "browserOnly": "https://www.rosha-24.ir/vista/total/gold-talent/file/index.php"
     },
     "exit": {
         "active": true,
