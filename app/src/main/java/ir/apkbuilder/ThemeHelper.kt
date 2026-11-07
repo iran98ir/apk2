@@ -28,8 +28,8 @@ object ThemeHelper {
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
 
-        window.statusBarColor = color
-        window.navigationBarColor = color
+        // window.statusBarColor = color
+        // window.navigationBarColor = color
 
         val light = isColorLight(color)
         val controller = WindowInsetsControllerCompat(window, window.decorView)
