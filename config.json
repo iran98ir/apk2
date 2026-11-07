@@ -1,7 +1,7 @@
 {
     "brand": {
         "mode": "new",
-        "name": "Growza24🌱",
+        "name": "Growza24",
         "pkg": "ir.growza24.tm",
         "ver": "3.14.08",
         "vcode": 5
@@ -121,7 +121,7 @@
     },
     "web": {
         "url": "https://www.rosha-24.ir/vista/totalapp/Growza24/index.php",
-        "extLink": false,
+        "extLink": true,
         "deepLink": true,
         "deepLinkUrl": "https://www.rosha-24.ir/vista/totalapp/Growza24/index.php",
         "keepSession": true,
@@ -275,4 +275,4 @@
         "deviceId": "deviceId",
         "failOpen": true
     }
-            }
+    }
