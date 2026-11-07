@@ -1,29 +1,29 @@
 {
     "brand": {
         "mode": "new",
-        "name": "mu✂️mu",
-        "pkg": "ir.mumu.real",
-        "ver": "3.14.07",
-        "vcode": 7
+        "name": "Growza24🌱",
+        "pkg": "ir.growza24.tm",
+        "ver": "3.14.08",
+        "vcode": 5
     },
     "splash": {
         "bgMode": "gradient",
-        "bg": "#FEDDEC",
-        "bg2": "#FEDDEC",
+        "bg": "#121B04",
+        "bg2": "#121B04",
         "bgAngle": 135,
         "hasIcon": true,
-        "iconSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1000\" width=\"1000\" height=\"1000\">\n  <defs>\n    <!-- گرادیان پس‌زمینه دایره -->\n    <radialGradient id=\"bgGrad\" cx=\"35%\" cy=\"30%\" r=\"75%\">\n      <stop offset=\"0%\"  stop-color=\"#FFF0F6\"/>\n      <stop offset=\"55%\" stop-color=\"#FFD6E8\"/>\n      <stop offset=\"100%\" stop-color=\"#FFB6D5\"/>\n    </radialGradient>\n\n    <!-- سایه نرم بیرونی -->\n    <filter id=\"softGlow\" x=\"-20%\" y=\"-20%\" width=\"140%\" height=\"140%\">\n      <feGaussianBlur in=\"SourceAlpha\" stdDeviation=\"12\"/>\n      <feOffset dx=\"0\" dy=\"0\"/>\n      <feComponentTransfer><feFuncA type=\"linear\" slope=\"0.35\"/></feComponentTransfer>\n      <feMerge>\n        <feMergeNode/>\n        <feMergeNode in=\"SourceGraphic\"/>\n      </feMerge>\n    </filter>\n\n    <!-- سایه متن -->\n    <filter id=\"textShadow\" x=\"-10%\" y=\"-10%\" width=\"120%\" height=\"130%\">\n      <feGaussianBlur in=\"SourceAlpha\" stdDeviation=\"4\"/>\n      <feOffset dx=\"0\" dy=\"6\"/>\n      <feComponentTransfer><feFuncA type=\"linear\" slope=\"0.25\"/></feComponentTransfer>\n      <feMerge>\n        <feMergeNode/>\n        <feMergeNode in=\"SourceGraphic\"/>\n      </feMerge>\n    </filter>\n  </defs>\n\n  <!-- پس‌زمینه شفاف (بدون مستطیل) — فقط دایره -->\n  <!-- دایره اصلی -->\n  <circle cx=\"500\" cy=\"500\" r=\"460\" fill=\"url(#bgGrad)\" filter=\"url(#softGlow)\"/>\n\n  <!-- حلقه نازک بیرونی -->\n  <circle cx=\"500\" cy=\"500\" r=\"440\" fill=\"none\"\n          stroke=\"rgba(255,105,180,0.45)\" stroke-width=\"3\"/>\n\n  <!-- حلقه نازک درونی -->\n  <circle cx=\"500\" cy=\"500\" r=\"400\" fill=\"none\"\n          stroke=\"rgba(255,105,180,0.22)\" stroke-width=\"1.5\"/>\n\n  <!-- ===== قلب تزئینی ===== -->\n  <g transform=\"translate(500, 300)\">\n    <!-- قلب با پاث -->\n    <path d=\"M0,18 C0,18 -28,-2 -28,-18 C-28,-30 -18,-36 -10,-36 C-4,-36 0,-31 0,-26 C0,-31 4,-36 10,-36 C18,-36 28,-30 28,-18 C28,-2 0,18 0,18 Z\"\n          fill=\"#FF4FA3\" opacity=\"0.9\"/>\n    <path d=\"M0,14 C0,14 -22,-2 -22,-15 C-22,-24 -15,-29 -9,-29 C-4,-29 0,-25 0,-21 C0,-25 4,-29 9,-29 C15,-29 22,-24 22,-15 C22,-2 0,14 0,14 Z\"\n          fill=\"#FF7CBE\" opacity=\"0.6\"/>\n  </g>\n\n  <!-- ===== متن mu✂️mu ===== -->\n  <!-- \"mu\" چپ -->\n  <text x=\"360\" y=\"540\" text-anchor=\"middle\"\n        font-family=\"Vazirmatn, Arial, sans-serif\"\n        font-weight=\"900\" font-size=\"180\" fill=\"#E91E8C\"\n        filter=\"url(#textShadow)\" letter-spacing=\"-4\">mu</text>\n\n  <!-- قیچی وسط -->\n  <g transform=\"translate(500, 490)\">\n    <!-- دسته‌های قیچی -->\n    <circle cx=\"-14\" cy=\"14\" r=\"10\" fill=\"none\" stroke=\"#E91E8C\" stroke-width=\"5\"/>\n    <circle cx=\"14\" cy=\"14\" r=\"10\" fill=\"none\" stroke=\"#E91E8C\" stroke-width=\"5\"/>\n    <!-- تیغه‌ها -->\n    <line x1=\"-8\" y1=\"6\" x2=\"8\" y2=\"-24\" stroke=\"#E91E8C\" stroke-width=\"5\" stroke-linecap=\"round\"/>\n    <line x1=\"8\" y1=\"6\" x2=\"-8\" y2=\"-24\" stroke=\"#E91E8C\" stroke-width=\"5\" stroke-linecap=\"round\"/>\n    <!-- پیچ وسط -->\n    <circle cx=\"0\" cy=\"-9\" r=\"3.5\" fill=\"#E91E8C\"/>\n  </g>\n\n  <!-- \"mu\" راست -->\n  <text x=\"640\" y=\"540\" text-anchor=\"middle\"\n        font-family=\"Vazirmatn, Arial, sans-serif\"\n        font-weight=\"900\" font-size=\"180\" fill=\"#E91E8C\"\n        filter=\"url(#textShadow)\" letter-spacing=\"-4\">mu</text>\n\n  <!-- ===== خط جداکننده قلب‌دار ===== -->\n  <g transform=\"translate(500, 610)\">\n    <!-- خط چپ -->\n    <line x1=\"-70\" y1=\"0\" x2=\"-18\" y2=\"0\"\n          stroke=\"#E91E8C\" stroke-width=\"3\" stroke-linecap=\"round\" opacity=\"0.7\"/>\n    <!-- نقطه وسط -->\n    <circle cx=\"0\" cy=\"0\" r=\"7\" fill=\"#E91E8C\"/>\n    <!-- خط راست -->\n    <line x1=\"18\" y1=\"0\" x2=\"70\" y2=\"0\"\n          stroke=\"#E91E8C\" stroke-width=\"3\" stroke-linecap=\"round\" opacity=\"0.7\"/>\n  </g>\n\n  <!-- ===== زیرنویس ===== -->\n  <text x=\"500\" y=\"675\" text-anchor=\"middle\"\n        font-family=\"Vazirmatn, Arial, sans-serif\"\n        font-weight=\"800\" font-size=\"34\" fill=\"rgba(233,30,140,0.75)\"\n        letter-spacing=\"3\">Beauty &amp; Style</text>\n\n</svg>",
+        "iconSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\" width=\"512\" height=\"512\">\n<defs>\n  <linearGradient id=\"bg\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\">\n    <stop stop-color=\"#202819\"/>\n    <stop offset=\".55\" stop-color=\"#080D06\"/>\n    <stop offset=\"1\" stop-color=\"#000\"/>\n  </linearGradient>\n  <linearGradient id=\"lime\" x1=\"0\" y1=\"1\" x2=\"1\" y2=\"0\">\n    <stop stop-color=\"#8CD900\"/>\n    <stop offset=\".55\" stop-color=\"#B8FF00\"/>\n    <stop offset=\"1\" stop-color=\"#E0FF64\"/>\n  </linearGradient>\n  <linearGradient id=\"floor\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\">\n    <stop stop-color=\"#B8FF00\" stop-opacity=\".22\"/>\n    <stop offset=\"1\" stop-color=\"#B8FF00\" stop-opacity=\"0\"/>\n  </linearGradient>\n  <filter id=\"glow\" x=\"-60%\" y=\"-60%\" width=\"220%\" height=\"220%\">\n    <feGaussianBlur stdDeviation=\"9\" result=\"b\"/>\n    <feMerge><feMergeNode in=\"b\"/><feMergeNode in=\"SourceGraphic\"/></feMerge>\n  </filter>\n  <filter id=\"shadow\" x=\"-50%\" y=\"-50%\" width=\"200%\" height=\"200%\">\n    <feGaussianBlur stdDeviation=\"16\"/>\n  </filter>\n</defs>\n\n<!-- Background -->\n<rect width=\"512\" height=\"512\" rx=\"112\" fill=\"#000\"/>\n<rect x=\"12\" y=\"12\" width=\"488\" height=\"488\" rx=\"101\" fill=\"url(#bg)\"/>\n\n<!-- Ambient light -->\n<ellipse cx=\"256\" cy=\"215\" rx=\"165\" ry=\"130\" fill=\"#AFFF00\" opacity=\".07\" filter=\"url(#shadow)\"/>\n\n<!-- Outer signature frame -->\n<rect x=\"23\" y=\"23\" width=\"466\" height=\"466\" rx=\"91\"\n      fill=\"none\" stroke=\"#B8FF00\" stroke-opacity=\".30\" stroke-width=\"2\"/>\n<rect x=\"32\" y=\"32\" width=\"448\" height=\"448\" rx=\"83\"\n      fill=\"none\" stroke=\"#FFFFFF\" stroke-opacity=\".07\"/>\n\n<!-- Corner details -->\n<path d=\"M75 111 V83 Q75 75 83 75 H111 M401 75 H429 Q437 75 437 83 V111\nM75 401 V429 Q75 437 83 437 H111 M401 437 H429 Q437 437 437 429 V401\"\n      fill=\"none\" stroke=\"#B8FF00\" stroke-width=\"3\" opacity=\".65\"/>\n\n<!-- Growth area -->\n<path d=\"M91 277 L145 219 L190 249 L257 145 L302 190 L390 76\nL415 99 L415 284 L91 284 Z\" fill=\"url(#floor)\"/>\n\n<!-- Original growth-arrow concept -->\n<path d=\"M91 277 L145 219 L190 249 L257 145 L302 190 L390 76\"\n      fill=\"none\" stroke=\"#B8FF00\" stroke-width=\"30\"\n      stroke-linecap=\"round\" stroke-linejoin=\"round\"\n      opacity=\".24\" filter=\"url(#glow)\"/>\n\n<path d=\"M91 277 L145 219 L190 249 L257 145 L302 190 L390 76\"\n      fill=\"none\" stroke=\"url(#lime)\" stroke-width=\"25\"\n      stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n\n<!-- Arrow head -->\n<path d=\"M352 65 L419 48 L414 119 L392 101 L372 119 L350 101 Z\"\n      fill=\"url(#lime)\" stroke=\"#D9FF68\" stroke-width=\"2\"\n      stroke-linejoin=\"round\"/>\n\n<!-- Brand separator -->\n<path d=\"M83 321 H429\" stroke=\"#B8FF00\" stroke-opacity=\".35\" stroke-width=\"2\"/>\n<circle cx=\"83\" cy=\"321\" r=\"4\" fill=\"#B8FF00\"/>\n<circle cx=\"429\" cy=\"321\" r=\"4\" fill=\"#B8FF00\"/>\n\n<!-- Brand name -->\n<text x=\"256\" y=\"390\" text-anchor=\"middle\"\n      font-family=\"Arial, sans-serif\"\n      font-size=\"66\" font-weight=\"800\"\n      letter-spacing=\"-3\" fill=\"#FFFFFF\">Growza<tspan fill=\"#B8FF00\">24</tspan></text>\n\n<!-- Signature sprout -->\n<g transform=\"translate(256 430)\">\n  <path d=\"M0 16 V-4\" fill=\"none\" stroke=\"#B8FF00\" stroke-width=\"4\" stroke-linecap=\"round\"/>\n  <path d=\"M0 -3 C-29 -32 -48 -20 -39 -2 C-31 13 -12 9 0 -3Z\" fill=\"#A9F000\"/>\n  <path d=\"M0 -3 C25 -34 47 -24 40 -5 C34 10 13 10 0 -3Z\" fill=\"#D0FF35\"/>\n</g>\n\n<!-- Bottom signature lines -->\n<path d=\"M194 467 H226 M286 467 H318\" stroke=\"#B8FF00\" stroke-width=\"2\" opacity=\".55\"/>\n<circle cx=\"183\" cy=\"467\" r=\"3\" fill=\"#B8FF00\"/>\n<circle cx=\"329\" cy=\"467\" r=\"3\" fill=\"#B8FF00\"/>\n\n</svg>",
         "iconColorOn": false,
         "iconColor": "#FEDDEC",
         "iconBgOn": false,
         "iconBg": "#FEDDEC",
-        "iconShape": "circle",
+        "iconShape": "rounded",
         "iconBoxSize": 200,
-        "iconSize": 130,
+        "iconSize": 136,
         "hasText": true,
-        "title": "مو ✂️ مو",
-        "tSize": 26,
-        "txt": "#E81D8C",
+        "title": "پلتفرم رشد",
+        "tSize": 17,
+        "txt": "#BFFE13",
         "iconPos": "top",
         "textPos": "bottom"
     },
@@ -89,7 +89,7 @@
         "totalPages": 3
     },
     "welcome": {
-        "active": true,
+        "active": false,
         "bgMode": "gradient",
         "bg": "#FEDDEC",
         "bg2": "#FEDDEC",
@@ -120,31 +120,31 @@
         "btnPos": "bottom"
     },
     "web": {
-        "url": "https://www.rosha-24.ir/vista/totalapp/mu-mu/index.php",
+        "url": "https://www.rosha-24.ir/vista/totalapp/Growza24/index.php",
         "extLink": false,
         "deepLink": true,
-        "deepLinkUrl": "https://www.rosha-24.ir/vista/totalapp/mu-mu/index.php",
+        "deepLinkUrl": "https://www.rosha-24.ir/vista/totalapp/Growza24/index.php",
         "keepSession": true,
-        "browserOnly": "https://www.rosha-24.ir/vista/total/gold-talent/file/index.php"
+        "browserOnly": ""
     },
     "exit": {
         "active": true,
-        "t": "خروج از اپ",
-        "m": "مطمئنی می‌خوای از اپ خارج بشی؟",
-        "bg": "#FFFFFF",
-        "txt": "#0F172A",
+        "t": "خروج",
+        "m": "بازم بیا و از اعضا حمایت کن",
+        "bg": "#121B04",
+        "txt": "#BFFE13",
         "tSize": 20,
         "mSize": 16,
         "btnSize": 16,
-        "anim": "glass",
+        "anim": "fade",
         "yes": "بله، خروج",
         "no": "بمان",
-        "yesBg": "#DC2626",
-        "yesTxt": "#FFFFFF",
+        "yesBg": "#BFFE13",
+        "yesTxt": "#121B04",
         "noBg": "#E5E7EB",
         "noTxt": "#0F172A",
-        "btnShape": "rounded",
-        "btnStyle": "elevated",
+        "btnShape": "square",
+        "btnStyle": "flat",
         "btnLayout": "row"
     },
     "error": {
@@ -160,7 +160,7 @@
                 "iconSize": 70,
                 "t": "اتصال اینترنت برقرار نیست",
                 "on": true,
-                "d": "لطفاً اتصال اینترنت خود را بررسی کنید و دوباره تلاش کنید و یا اگر فیلترشکن روشن است آن را خاموش کنید"
+                "d": "لطفاً اتصال اینترنت خود را بررسی کنید و دوباره تلاش کنید"
             },
             "timeout": {
                 "iconSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.2 14.2L11 13V7h1.5v5.2l4.5 2.7-.8 1.3z\"/></svg>",
@@ -173,7 +173,7 @@
                 "iconSize": 92,
                 "t": "سرور پاسخ نمی‌دهد",
                 "on": true,
-                "d": "ارتباط با سرور طول کشید. لطفاً چند لحظه دیگر دوباره امتحان کنید و یا اگر فیلترشکن روشن است آن را خاموش کنید"
+                "d": "ارتباط با سرور طول کشید دوباره امتحان کنید"
             },
             "dns": {
                 "iconSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z\"/></svg>",
@@ -184,9 +184,9 @@
                 "iconShape": "circle",
                 "iconBoxSize": 140,
                 "iconSize": 70,
-                "t": "آدرس سایت پیدا نشد",
+                "t": "خطا در برقراری ارتباط",
                 "on": true,
-                "d": "امکان یافتن آدرس سرور وجود ندارد. اتصال اینترنت یا DNS خود را بررسی کنید و یا اگر فیلترشکن روشن است آن را خاموش کنید"
+                "d": "اتصال اینترنت یا DNS خود را بررسی کنید و یا فیلتر شکن دیگری استفاده نمایید"
             },
             "ssl": {
                 "iconSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z\"/></svg>",
@@ -199,7 +199,7 @@
                 "iconSize": 70,
                 "t": "اتصال امن برقرار نشد",
                 "on": true,
-                "d": "گواهی امنیتی سرور معتبر نیست. لطفاً با پشتیبانی تماس بگیرید و یا اگر فیلترشکن روشن است آن را خاموش کنید"
+                "d": "گواهی امنیتی سرور معتبر نیست. لطفاً با پشتیبانی تماس بگیرید"
             },
             "e404": {
                 "iconSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z\"/></svg>",
@@ -256,16 +256,16 @@
         },
         "active": true,
         "bgMode": "single",
-        "bg": "#E81D8C",
-        "bg2": "#E81D8C",
+        "bg": "#121B04",
+        "bg2": "#121B04",
         "bgAngle": 135,
-        "txt": "#FEDDEC",
+        "txt": "#BFFE13",
         "tSize": 22,
         "dSize": 16,
         "retryText": "تلاش مجدد",
-        "btnBg": "#FEDDEC",
-        "btnShape": "rounded",
-        "btnStyle": "outline"
+        "btnBg": "#DC2626",
+        "btnShape": "square",
+        "btnStyle": "flat"
     },
     "shokhi": {
         "active": false,
