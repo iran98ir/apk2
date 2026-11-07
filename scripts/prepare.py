@@ -103,8 +103,6 @@ def write_themes():
 <resources xmlns:tools="http://schemas.android.com/tools">
     <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="android:windowBackground">@color/welcome_bg</item>
-        <item name="android:statusBarColor">@color/welcome_bg</item>
-        <item name="android:navigationBarColor">@color/welcome_bg</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
     </style>
