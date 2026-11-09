@@ -258,6 +258,11 @@ class WebActivity : AppCompatActivity() {
         root.addView(webView)
         setContentView(root)
 
+        // ═══════════════════════════════════════════════════════
+        // ✅ خط اضافه شده: فعال‌سازی Edge-to-Edge برای حذف فضای خالی پایین
+        // ═══════════════════════════════════════════════════════
+        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
+
         ThemeHelper.applySystemBars(this, config)
         webView.loadUrl(web.url)
     }
