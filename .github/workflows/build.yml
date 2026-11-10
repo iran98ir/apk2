@@ -5,8 +5,7 @@ on:
   push:
     paths:
       - 'config.json'
-      - 'icon.png'
-      - 'icon_round.png'
+      - 'icon.svg'
       - 'font/**'
       - '.github/workflows/build.yml'
 
@@ -20,7 +19,7 @@ jobs:
 
       - name: Validate required files
         run: |
-          for f in config.json icon.png icon_round.png font/lalezar.ttf; do
+          for f in config.json icon.svg font/lalezar.ttf; do
             if [ ! -f "$f" ]; then
               echo "ERROR: missing $f"
               exit 1
@@ -33,7 +32,10 @@ jobs:
           python-version: '3.11'
 
       - name: Install Python deps
-        run: pip install pillow
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcairo2
+          pip install pillow cairosvg
 
       - name: Setup JDK 17
         uses: actions/setup-java@v4
