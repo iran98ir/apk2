@@ -6,24 +6,24 @@ prepare.py
 - strings.xml (app_name)
 - colors.xml (رنگ‌های welcome)
 - AndroidManifest.xml (applicationId, versionName, versionCode)
-- کپی icon.png / icon_round.png به mipmap با همه سایزها
+- خواندن icon.svg از ریشه ریپو و تبدیل به mipmap با همه سایزها
 - کپی font/lalezar.ttf به res/font
 - کپی config.json به assets
 - ساخت themes.xml (بدون هاردکد، از welcome.bg)
 - ساخت app/build.gradle.kts با applicationId و نسخه از json
 """
 
+import io
 import json
-import os
 import shutil
 import sys
 from pathlib import Path
 from PIL import Image
+import cairosvg
 
 ROOT = Path(__file__).resolve().parent.parent
 CONFIG_PATH = ROOT / "config.json"
-ICON_PATH = ROOT / "icon.png"
-ICON_ROUND_PATH = ROOT / "icon_round.png"
+ICON_SVG_PATH = ROOT / "icon.svg"
 FONT_PATH = ROOT / "font" / "lalezar.ttf"
 
 APP_DIR = ROOT / "app" / "src" / "main"
@@ -149,10 +149,20 @@ def write_manifest(pkg: str, version_name: str, version_code: int):
     (APP_DIR / "AndroidManifest.xml").write_text(content, encoding="utf-8")
 
 
-def copy_icon(src: Path, res: Path):
-    if not src.exists():
-        fail(f"missing icon file: {src}")
-    img = Image.open(src).convert("RGBA")
+def copy_icon(res: Path):
+    if not ICON_SVG_PATH.exists():
+        fail(f"missing icon.svg at repo root: {ICON_SVG_PATH}")
+
+    try:
+        png_bytes = cairosvg.svg2png(
+            url=str(ICON_SVG_PATH),
+            output_width=1024,
+            output_height=1024,
+        )
+    except Exception as e:
+        fail(f"failed to render icon.svg: {e}")
+
+    img = Image.open(io.BytesIO(png_bytes)).convert("RGBA")
 
     sizes = {
         "mipmap-mdpi": 48,
@@ -166,19 +176,7 @@ def copy_icon(src: Path, res: Path):
         out.mkdir(parents=True, exist_ok=True)
         resized = img.resize((size, size), Image.LANCZOS)
         resized.save(out / "ic_launcher.png", "PNG")
-
-    # round
-    if ICON_ROUND_PATH.exists():
-        img2 = Image.open(ICON_ROUND_PATH).convert("RGBA")
-        for folder, size in sizes.items():
-            out = res / folder
-            resized = img2.resize((size, size), Image.LANCZOS)
-            resized.save(out / "ic_launcher_round.png", "PNG")
-    else:
-        for folder, size in sizes.items():
-            out = res / folder
-            resized = img.resize((size, size), Image.LANCZOS)
-            resized.save(out / "ic_launcher_round.png", "PNG")
+        resized.save(out / "ic_launcher_round.png", "PNG")
 
 
 def copy_font():
@@ -253,7 +251,6 @@ dependencies {{
 def main():
     cfg = load_config()
 
-    # فیلدهای اجباری
     name = require(cfg, "brand.name")
     pkg = require(cfg, "brand.pkg")
     ver = require(cfg, "brand.ver")
@@ -272,7 +269,7 @@ def main():
     write_themes()
     write_manifest(pkg, ver, vcode)
     write_gradle_app(pkg, ver, vcode)
-    copy_icon(ICON_PATH, RES_DIR)
+    copy_icon(RES_DIR)
     copy_font()
     copy_config_to_assets(cfg)
 
