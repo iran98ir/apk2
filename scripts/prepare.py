@@ -138,7 +138,7 @@ def write_manifest(pkg: str, version_name: str, version_code: int):
 
         <activity android:name=".OnboardingActivity" android:exported="false" />
         <activity android:name=".WelcomeActivity" android:exported="false" />
-        <activity android:name=".WebActivity" android:exported="false" />
+        <activity android:name=".WebActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".ErrorActivity" android:exported="false" />
 
     </application>
