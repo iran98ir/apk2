@@ -116,8 +116,8 @@ class WebActivity : AppCompatActivity() {
         settings.javaScriptEnabled = true
         settings.domStorageEnabled = true
         settings.databaseEnabled = true
-        settings.loadWithOverviewMode = false
-        settings.useWideViewPort = false
+        settings.loadWithOverviewMode = true
+        settings.useWideViewPort = true
         settings.setSupportZoom(false)
         settings.builtInZoomControls = false
         settings.displayZoomControls = false
