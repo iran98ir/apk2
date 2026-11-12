@@ -6,24 +6,23 @@ prepare.py
 - strings.xml (app_name)
 - colors.xml (رنگ‌های welcome)
 - AndroidManifest.xml (applicationId, versionName, versionCode)
-- خواندن icon.svg از ریشه ریپو و تبدیل به mipmap با همه سایزها
+- خواندن icon.png و icon2.png از ریشه ریپو و ساخت mipmap با همه سایزها
 - کپی font/lalezar.ttf به res/font
 - کپی config.json به assets
 - ساخت themes.xml (بدون هاردکد، از welcome.bg)
 - ساخت app/build.gradle.kts با applicationId و نسخه از json
 """
 
-import io
 import json
 import shutil
 import sys
 from pathlib import Path
 from PIL import Image
-import cairosvg
 
 ROOT = Path(__file__).resolve().parent.parent
 CONFIG_PATH = ROOT / "config.json"
-ICON_SVG_PATH = ROOT / "icon.svg"
+ICON_PNG_PATH = ROOT / "icon.png"
+ICON2_PNG_PATH = ROOT / "icon2.png"
 FONT_PATH = ROOT / "font" / "lalezar.ttf"
 
 APP_DIR = ROOT / "app" / "src" / "main"
@@ -150,19 +149,16 @@ def write_manifest(pkg: str, version_name: str, version_code: int):
 
 
 def copy_icon(res: Path):
-    if not ICON_SVG_PATH.exists():
-        fail(f"missing icon.svg at repo root: {ICON_SVG_PATH}")
+    if not ICON_PNG_PATH.exists():
+        fail(f"missing icon.png at repo root: {ICON_PNG_PATH}")
+    if not ICON2_PNG_PATH.exists():
+        fail(f"missing icon2.png at repo root: {ICON2_PNG_PATH}")
 
     try:
-        png_bytes = cairosvg.svg2png(
-            url=str(ICON_SVG_PATH),
-            output_width=1024,
-            output_height=1024,
-        )
+        icon_img = Image.open(ICON_PNG_PATH).convert("RGBA")
+        icon2_img = Image.open(ICON2_PNG_PATH).convert("RGBA")
     except Exception as e:
-        fail(f"failed to render icon.svg: {e}")
-
-    img = Image.open(io.BytesIO(png_bytes)).convert("RGBA")
+        fail(f"failed to open icon PNG files: {e}")
 
     sizes = {
         "mipmap-mdpi": 48,
@@ -174,9 +170,12 @@ def copy_icon(res: Path):
     for folder, size in sizes.items():
         out = res / folder
         out.mkdir(parents=True, exist_ok=True)
-        resized = img.resize((size, size), Image.LANCZOS)
-        resized.save(out / "ic_launcher.png", "PNG")
-        resized.save(out / "ic_launcher_round.png", "PNG")
+
+        icon_resized = icon_img.resize((size, size), Image.LANCZOS)
+        icon_resized.save(out / "ic_launcher.png", "PNG")
+
+        icon2_resized = icon2_img.resize((size, size), Image.LANCZOS)
+        icon2_resized.save(out / "ic_launcher_round.png", "PNG")
 
 
 def copy_font():
