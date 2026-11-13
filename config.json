@@ -1,10 +1,10 @@
 {
     "brand": {
         "mode": "new",
-        "name": "Growza24",
-        "pkg": "ir.growza24.tm",
-        "ver": "3.14.06",
-        "vcode": 5
+        "name": "levelup",
+        "pkg": "it.level.up",
+        "ver": "9.22.03",
+        "vcode": 11
     },
     "splash": {
         "bgMode": "gradient",
@@ -21,7 +21,7 @@
         "iconBoxSize": 200,
         "iconSize": 136,
         "hasText": true,
-        "title": "پلتفرم رشد در اینستاگرام",
+        "title": "سطحی بالاتر از یک شغل",
         "tSize": 17,
         "txt": "#BFFE13",
         "iconPos": "top",
@@ -120,10 +120,10 @@
         "btnPos": "bottom"
     },
     "web": {
-        "url": "https://www.rosha-24.ir/vista/totalapp/Growza24/settings/login/login-follow-me.php",
+        "url": "https://iran98ir.github.io/amniatsaz/index.html",
         "extLink": true,
         "deepLink": true,
-        "deepLinkUrl": "https://www.rosha-24.ir/vista/totalapp/Growza24/settings/login/login-follow-me.php",
+        "deepLinkUrl": "https://iran98ir.github.io/amniatsaz/index.html",
         "keepSession": true,
         "browserOnly": ""
     },
@@ -275,4 +275,4 @@
         "deviceId": "deviceId",
         "failOpen": true
     }
-}
+    }
