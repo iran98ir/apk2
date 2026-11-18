@@ -1,828 +1,278 @@
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#D95A25">
-<title>راهنمای استفاده | Ai-Sinova</title>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-<style>
-:root{
-  --orange:#F47B3E;
-  --orange2:#E7652E;
-  --orange3:#B83F1B;
-  --cream:#FFF3E7;
-  --dark:#351C16;
-  --dark2:#512719;
-  --muted:#FFE0C9;
-  --glass:rgba(255,244,232,.13);
-  --border:rgba(255,239,220,.25);
+{
+    "brand": {
+        "mode": "new",
+        "name": "ai.sinova",
+        "pkg": "ai.sinova.ir",
+        "ver": "08.12.43",
+        "vcode": 8
+    },
+    "splash": {
+        "bgMode": "gradient",
+        "bg": "#E46C36",
+        "bg2": "#532F22",
+        "bgAngle": 325,
+        "hasIcon": false,
+        "iconSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\" width=\"512\" height=\"512\">\n  <defs>\n    <radialGradient id=\"bg\" cx=\"45%\" cy=\"55%\" r=\"85%\">\n      <stop offset=\"0%\" stop-color=\"#0B1405\"/>\n      <stop offset=\"65%\" stop-color=\"#040802\"/>\n      <stop offset=\"100%\" stop-color=\"#000000\"/>\n    </radialGradient>\n    \n    <linearGradient id=\"lime\" x1=\"0%\" y1=\"100%\" x2=\"100%\" y2=\"0%\">\n      <stop offset=\"0%\" stop-color=\"#B8FF3C\"/>\n      <stop offset=\"100%\" stop-color=\"#D6FF7E\"/>\n    </linearGradient>\n    \n    <linearGradient id=\"insta\" x1=\"0%\" y1=\"100%\" x2=\"100%\" y2=\"0%\">\n      <stop offset=\"0%\" stop-color=\"#833AB4\"/>\n      <stop offset=\"25%\" stop-color=\"#C13584\"/>\n      <stop offset=\"50%\" stop-color=\"#E1306C\"/>\n      <stop offset=\"75%\" stop-color=\"#F77737\"/>\n      <stop offset=\"100%\" stop-color=\"#FCAF45\"/>\n    </linearGradient>\n    \n    <linearGradient id=\"instaRev\" x1=\"100%\" y1=\"0%\" x2=\"0%\" y2=\"100%\">\n      <stop offset=\"0%\" stop-color=\"#FCAF45\"/>\n      <stop offset=\"50%\" stop-color=\"#E1306C\"/>\n      <stop offset=\"100%\" stop-color=\"#833AB4\"/>\n    </linearGradient>\n    \n    <filter id=\"glowSoft\" x=\"-60%\" y=\"-60%\" width=\"220%\" height=\"220%\">\n      <feGaussianBlur stdDeviation=\"4\" result=\"b\"/>\n      <feMerge><feMergeNode in=\"b\"/><feMergeNode in=\"SourceGraphic\"/></feMerge>\n    </filter>\n    \n    <filter id=\"glowArrow\" x=\"-80%\" y=\"-80%\" width=\"260%\" height=\"260%\">\n      <feGaussianBlur stdDeviation=\"8\" result=\"b\"/>\n      <feMerge><feMergeNode in=\"b\"/><feMergeNode in=\"SourceGraphic\"/></feMerge>\n    </filter>\n    \n    <filter id=\"heartGlow\" x=\"-80%\" y=\"-80%\" width=\"260%\" height=\"260%\">\n      <feGaussianBlur stdDeviation=\"2\" result=\"b\"/>\n      <feMerge><feMergeNode in=\"b\"/><feMergeNode in=\"SourceGraphic\"/></feMerge>\n    </filter>\n    \n    <filter id=\"shadowGreen\" x=\"-50%\" y=\"-50%\" width=\"200%\" height=\"200%\">\n      <feDropShadow dx=\"0\" dy=\"7\" stdDeviation=\"11\" flood-color=\"#000000\" flood-opacity=\"0.95\"/>\n      <feDropShadow dx=\"0\" dy=\"0\" stdDeviation=\"9\" flood-color=\"#B8FF3C\" flood-opacity=\"0.65\"/>\n    </filter>\n  </defs>\n  \n  <!-- ===== پس‌زمینه ===== -->\n  <rect width=\"512\" height=\"512\" rx=\"115\" fill=\"url(#bg)\"/>\n  <ellipse cx=\"256\" cy=\"256\" rx=\"180\" ry=\"180\" fill=\"#B8FF3C\" opacity=\"0.04\"/>\n  \n  <!-- ===== سه لایه کادر گرادیان اینستاگرام ===== -->\n  <rect x=\"14\" y=\"14\" width=\"484\" height=\"484\" rx=\"110\"\n        fill=\"none\" stroke=\"url(#insta)\" stroke-width=\"3\" opacity=\"0.6\"/>\n  <rect x=\"34\" y=\"34\" width=\"444\" height=\"444\" rx=\"98\"\n        fill=\"none\" stroke=\"url(#instaRev)\" stroke-width=\"5\"\n        opacity=\"0.75\" filter=\"url(#glowSoft)\"/>\n  <rect x=\"58\" y=\"58\" width=\"396\" height=\"396\" rx=\"86\"\n        fill=\"none\" stroke=\"url(#insta)\" stroke-width=\"11\"\n        filter=\"url(#glowSoft)\"/>\n  \n  <!-- ===== فلش طبیعی — بدنه به مرکز نوک ===== -->\n  <g filter=\"url(#shadowGreen)\">\n    <g filter=\"url(#glowArrow)\">\n      <!-- بدنه: از پایین‌چپ تا مرکز نوک (400,145) -->\n      <path d=\"M 92 412\n               C 118 412, 132 370, 155 355\n               C 180 338, 192 372, 218 350\n               C 245 327, 252 262, 278 250\n               C 305 238, 318 288, 345 240\n               C 365 205, 380 175, 400 145\"\n            fill=\"none\"\n            stroke=\"url(#lime)\"\n            stroke-width=\"18\"\n            stroke-linecap=\"round\"\n            stroke-linejoin=\"round\"/>\n      \n      <!-- نوک فلش: مرکز در (400,145) — بدنه دقیقاً به مرکز می‌خورد -->\n      <path d=\"M 365 128 L 404 145 L 382 185\"\n            fill=\"none\"\n            stroke=\"url(#lime)\"\n            stroke-width=\"18\"\n            stroke-linecap=\"round\"\n            stroke-linejoin=\"round\"/>\n    </g>\n  </g>\n  \n  <!-- ===== ۲۰ قلب کوچک (۵۰٪ کوچک‌تر) پراکنده با چرخش متناوب ===== -->\n  <g filter=\"url(#heartGlow)\">\n    \n    <!-- ردیف بالا -->\n    <g transform=\"translate(90 110) rotate(-25) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#ED4956\"/>\n    </g>\n    <g transform=\"translate(150 85) rotate(15) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#E1306C\"/>\n    </g>\n    <g transform=\"translate(210 105) rotate(-30) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#C13584\"/>\n    </g>\n    <g transform=\"translate(265 88) rotate(20) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#FCAF45\"/>\n    </g>\n    <g transform=\"translate(320 108) rotate(-18) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#F77737\"/>\n    </g>\n    \n    <!-- ردیف دوم -->\n    <g transform=\"translate(70 175) rotate(22) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#4A90E2\"/>\n    </g>\n    <g transform=\"translate(130 165) rotate(-28) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#B8FF3C\"/>\n    </g>\n    <g transform=\"translate(195 178) rotate(18) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#833AB4\"/>\n    </g>\n    <g transform=\"translate(255 170) rotate(-22) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#FF6B9D\"/>\n    </g>\n    <g transform=\"translate(310 182) rotate(25) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#FD1D1D\"/>\n    </g>\n    \n    <!-- ردیف سوم -->\n    <g transform=\"translate(80 250) rotate(-20) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#FCAF45\"/>\n    </g>\n    <g transform=\"translate(145 245) rotate(28) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#E1306C\"/>\n    </g>\n    <g transform=\"translate(320 260) rotate(-25) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#C13584\"/>\n    </g>\n    <g transform=\"translate(380 245) rotate(18) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#B8FF3C\"/>\n    </g>\n    \n    <!-- ردیف چهارم -->\n    <g transform=\"translate(95 330) rotate(22) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#FD1D1D\"/>\n    </g>\n    <g transform=\"translate(160 325) rotate(-18) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#F77737\"/>\n    </g>\n    <g transform=\"translate(360 330) rotate(-28) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#4A90E2\"/>\n    </g>\n    <g transform=\"translate(415 310) rotate(25) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#FF6B9D\"/>\n    </g>\n    \n    <!-- ردیف پایین -->\n    <g transform=\"translate(180 415) rotate(-22) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#833AB4\"/>\n    </g>\n    <g transform=\"translate(280 420) rotate(18) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#E1306C\"/>\n    </g>\n    \n  </g>\n  \n  <!-- ===== نقطه‌های داده ===== -->\n  <g filter=\"url(#glowSoft)\">\n    <circle cx=\"92\" cy=\"412\" r=\"10\" fill=\"#B8FF3C\"/>\n    <circle cx=\"92\" cy=\"412\" r=\"3.5\" fill=\"#FFFFFF\" opacity=\"0.85\"/>\n    <circle cx=\"218\" cy=\"350\" r=\"8\" fill=\"#B8FF3C\"/>\n    <circle cx=\"345\" cy=\"240\" r=\"8\" fill=\"#B8FF3C\"/>\n  </g>\n</svg>",
+        "iconColorOn": false,
+        "iconColor": "#1E293B",
+        "iconBgOn": false,
+        "iconBg": "#1E293B",
+        "iconShape": "rounded",
+        "iconBoxSize": 200,
+        "iconSize": 136,
+        "hasText": true,
+        "title": "دنیای فیلم ها به زبان تو",
+        "tSize": 17,
+        "txt": "#532F22",
+        "iconPos": "center",
+        "textPos": "bottom"
+    },
+    "onb": {
+        "pages": [
+            {
+                "iconSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\" width=\"200\" height=\"200\" role=\"img\">\n  <title>کاردار</title>\n  <defs>\n    <linearGradient id=\"karGold\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"100%\">\n      <stop offset=\"0%\" stop-color=\"#e8c65a\"/>\n      <stop offset=\"50%\" stop-color=\"#d4af37\"/>\n      <stop offset=\"100%\" stop-color=\"#b8952e\"/>\n    </linearGradient>\n  </defs>\n  <rect x=\"61\" y=\"36\" width=\"78\" height=\"78\" rx=\"10\" fill=\"url(#karGold)\" transform=\"rotate(45 100 75)\" stroke=\"#a8821f\" stroke-width=\"0.8\"/>\n  <g transform=\"translate(82 57) scale(1.5) rotate(-45 12 12)\">\n    <path fill=\"#2E4732\" d=\"M2.4 0A2.395 2.395 0 0 0 0 2.4v19.2C0 22.9296 1.0704 24 2.4 24h19.2c1.3296 0 2.4-1.0704 2.4-2.4V2.4C24 1.0704 22.9296 0 21.6 0H10.112v11.7119l3.648-4.128h6l-4.58 4.3506 4.868 8.1296h-5.52l-2.5938-5.0211L10.112 16.8v3.264H5.12V0Z\"/>\n  </g>\n  <text x=\"100\" y=\"172\" text-anchor=\"middle\" font-family=\"Vazirmatn, Tahoma, sans-serif\" font-size=\"26\" font-weight=\"900\" fill=\"#2E4732\" direction=\"rtl\">کاردار</text>\n</svg>",
+                "iconColorOn": false,
+                "iconColor": "#4F46E5",
+                "iconBgOn": false,
+                "iconBg": "#EEF2FF",
+                "iconShape": "circle",
+                "iconBoxSize": 200,
+                "iconSize": 76,
+                "t": "کاردار",
+                "tSize": 24,
+                "d": "فرصت های شغلی در کشور عراق",
+                "dSize": 16,
+                "iconPos": "top",
+                "textPos": "bottom"
+            },
+            {
+                "iconSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\" width=\"200\" height=\"200\" role=\"img\">\n  <title>کاردار</title>\n  <defs>\n    <linearGradient id=\"karGold\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"100%\">\n      <stop offset=\"0%\" stop-color=\"#e8c65a\"/>\n      <stop offset=\"50%\" stop-color=\"#d4af37\"/>\n      <stop offset=\"100%\" stop-color=\"#b8952e\"/>\n    </linearGradient>\n  </defs>\n  <rect x=\"61\" y=\"36\" width=\"78\" height=\"78\" rx=\"10\" fill=\"url(#karGold)\" transform=\"rotate(45 100 75)\" stroke=\"#a8821f\" stroke-width=\"0.8\"/>\n  <g transform=\"translate(82 57) scale(1.5) rotate(-45 12 12)\">\n    <path fill=\"#2E4732\" d=\"M2.4 0A2.395 2.395 0 0 0 0 2.4v19.2C0 22.9296 1.0704 24 2.4 24h19.2c1.3296 0 2.4-1.0704 2.4-2.4V2.4C24 1.0704 22.9296 0 21.6 0H10.112v11.7119l3.648-4.128h6l-4.58 4.3506 4.868 8.1296h-5.52l-2.5938-5.0211L10.112 16.8v3.264H5.12V0Z\"/>\n  </g>\n  <text x=\"100\" y=\"172\" text-anchor=\"middle\" font-family=\"Vazirmatn, Tahoma, sans-serif\" font-size=\"26\" font-weight=\"900\" fill=\"#2E4732\" direction=\"rtl\">کاردار</text>\n</svg>",
+                "iconColorOn": false,
+                "iconColor": "#4F46E5",
+                "iconBgOn": false,
+                "iconBg": "#EEF2FF",
+                "iconShape": "circle",
+                "iconBoxSize": 200,
+                "iconSize": 76,
+                "t": "ثبت درخواست",
+                "tSize": 24,
+                "d": "به آسانی شغل مورد نظر خود را انتخاب کنید",
+                "dSize": 16,
+                "iconPos": "top",
+                "textPos": "bottom"
+            },
+            {
+                "iconSvg": "<svg fill=\"#2E4732\" role=\"img\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"><title>Infomaniak</title><path d=\"M2.4 0A2.395 2.395 0 0 0 0 2.4v19.2C0 22.9296 1.0704 24 2.4 24h19.2c1.3296 0 2.4-1.0704 2.4-2.4V2.4C24 1.0704 22.9296 0 21.6 0H10.112v11.7119l3.648-4.128h6l-4.58 4.3506 4.868 8.1296h-5.52l-2.5938-5.0211L10.112 16.8v3.264H5.12V0Z\"/></svg>",
+                "iconColorOn": false,
+                "iconColor": "#4F46E5",
+                "iconBgOn": false,
+                "iconBg": "#EEF2FF",
+                "iconShape": "circle",
+                "iconBoxSize": 104,
+                "iconSize": 76,
+                "t": "استخدام فوری",
+                "tSize": 24,
+                "d": "پیگیری فقط با ثبت درخواست",
+                "dSize": 16,
+                "iconPos": "top",
+                "textPos": "bottom"
+            }
+        ],
+        "active": false,
+        "firstRunOnly": true,
+        "count": "3",
+        "bgMode": "gradient",
+        "bg": "#F6F4EE",
+        "bg2": "#F6F4EE",
+        "bgAngle": 135,
+        "txt": "#2E4732",
+        "totalPages": 3
+    },
+    "welcome": {
+        "active": false,
+        "bgMode": "gradient",
+        "bg": "#D95A25",
+        "bg2": "#D95A25",
+        "bgAngle": 190,
+        "txt": "#E81D8C",
+        "hasIcon": true,
+        "iconSvg": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<svg width=\"48px\" height=\"48px\" viewBox=\"0 0 48 48\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n    <title>Icon-Resource/Networking-and-Content-Delivery/Res_Amazon-VPC_VPN-Gateway_48</title>\n    <g id=\"Icon-Resource/Networking-and-Content-Delivery/Res_Amazon-VPC_VPN-Gateway_48\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n        <path d=\"M24.0015,25.4385 C24.6565,25.4385 25.1885,25.9705 25.1885,26.6255 C25.1885,27.2815 24.6565,27.8135 24.0015,27.8135 C23.3465,27.8135 22.8135,27.2815 22.8135,26.6255 C22.8135,25.9705 23.3465,25.4385 24.0015,25.4385 L24.0015,25.4385 Z M23.0015,29.6365 L23.0015,32.6915 L25.0015,32.6915 L25.0015,29.6365 C26.2685,29.2145 27.1895,28.0325 27.1895,26.6255 C27.1895,24.8685 25.7595,23.4385 24.0015,23.4385 C22.2435,23.4385 20.8135,24.8685 20.8135,26.6255 C20.8135,28.0325 21.7345,29.2145 23.0015,29.6365 L23.0015,29.6365 Z M24.0015,44.0015 C12.9725,44.0015 3.9995,35.0295 3.9995,24.0015 C3.9995,12.9725 12.9725,4.0005 24.0015,4.0005 C35.0295,4.0005 44.0025,12.9725 44.0025,24.0015 C44.0025,35.0295 35.0295,44.0015 24.0015,44.0015 L24.0015,44.0015 Z M24.0015,2.0005 C11.8695,2.0005 1.9995,11.8695 1.9995,24.0015 C1.9995,36.1325 11.8695,46.0015 24.0015,46.0015 C36.1335,46.0015 46.0025,36.1325 46.0025,24.0015 C46.0025,11.8695 36.1335,2.0005 24.0015,2.0005 L24.0015,2.0005 Z M32.6195,34.3765 L15.3755,34.3695 L15.3805,21.5005 L32.6265,21.5075 L32.6195,34.3765 Z M19.7545,16.0965 C19.7585,14.9175 20.2075,13.8135 21.0195,12.9845 C21.8205,12.1675 22.8815,11.7165 24.0075,11.7165 L24.0225,11.7165 C25.1475,11.7195 26.2045,12.1795 26.9985,13.0095 C27.7995,13.8475 28.2385,14.9605 28.2345271,16.1485 L28.2345271,19.5055 L19.7385,19.5025 L19.7545,16.0965 Z M33.6265,19.5075 L30.2345,19.5065 L30.2345,16.1515 C30.2405,14.4485 29.6045,12.8405 28.4435,11.6275 C27.2715,10.4005 25.7025,9.7215 24.0275,9.7165 L24.0075,9.7165 C22.3395,9.7165 20.7725,10.3795 19.5915,11.5845 C18.4125,12.7875 17.7605,14.3875 17.7545,16.0885 L17.7385,19.5015 L14.3805,19.5015 C14.1155,19.5015 13.8605,19.6065 13.6735,19.7935 C13.4855,19.9815 13.3805,20.2355 13.3805,20.5015 L13.3755,35.3695 C13.3755,35.9205 13.8225,36.3695 14.3755,36.3695 L33.6195,36.3765 C34.1715,36.3765 34.6195,35.9295 34.6195,35.3765 L34.6265,20.5075 C34.6265,20.2435 34.5215,19.9885 34.3335,19.8005 C34.1465,19.6135 33.8925,19.5075 33.6265,19.5075 L33.6265,19.5075 Z\" id=\"AWS-Amazon-VPC_VPN-gateway_Resource-Icon_light-bg\" fill=\"#0098FF\"></path>\n    </g>\n</svg>",
+        "iconColorOn": true,
+        "iconColor": "#FEDDEC",
+        "iconBgOn": false,
+        "iconBg": "#EEF2FF",
+        "iconShape": "circle",
+        "iconBoxSize": 200,
+        "iconSize": 98,
+        "t": "فیلتر شکن را خاموش کنید",
+        "tSize": 28,
+        "d": "دسترسی به این برنامه فقط از داخل ایران مقدور است؛ اگر vpn روشن است آن را خاموش کنید",
+        "dSize": 17,
+        "btn": "ورود",
+        "btnShape": "pill",
+        "btnStyle": "elevated",
+        "btnBg": "#E81D8C",
+        "btnTxt": "#FEDDEC",
+        "btnSize": 15,
+        "btnRadius": 8,
+        "iconPos": "top",
+        "textPos": "center",
+        "btnPos": "bottom"
+    },
+    "web": {
+        "url": "https://iran98ir.github.io/ai-sinova/index.html",
+        "extLink": true,
+        "deepLink": true,
+        "deepLinkUrl": "https://iran98ir.github.io/ai-sinova/index.html",
+        "keepSession": true,
+        "browserOnly": ""
+    },
+    "exit": {
+        "active": true,
+        "t": "خروج",
+        "m": "بازم بیا و از اعضا حمایت کن",
+        "bg": "#121B04",
+        "txt": "#BFFE13",
+        "tSize": 20,
+        "mSize": 16,
+        "btnSize": 16,
+        "anim": "fade",
+        "yes": "بله، خروج",
+        "no": "بمان",
+        "yesBg": "#BFFE13",
+        "yesTxt": "#121B04",
+        "noBg": "#E5E7EB",
+        "noTxt": "#0F172A",
+        "btnShape": "square",
+        "btnStyle": "flat",
+        "btnLayout": "row"
+    },
+    "error": {
+        "items": {
+            "offline": {
+                "iconSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z\"/></svg>",
+                "iconColorOn": true,
+                "iconColor": "#0EA5E9",
+                "iconBgOn": false,
+                "iconBg": "#FEE2E2",
+                "iconShape": "circle",
+                "iconBoxSize": 140,
+                "iconSize": 70,
+                "t": "اتصال اینترنت برقرار نیست",
+                "on": true,
+                "d": "لطفاً اتصال اینترنت خود را بررسی کنید و دوباره تلاش کنید"
+            },
+            "timeout": {
+                "iconSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.2 14.2L11 13V7h1.5v5.2l4.5 2.7-.8 1.3z\"/></svg>",
+                "iconColorOn": true,
+                "iconColor": "#0EA5E9",
+                "iconBgOn": false,
+                "iconBg": "#0EA5E9",
+                "iconShape": "circle",
+                "iconBoxSize": 140,
+                "iconSize": 92,
+                "t": "سرور پاسخ نمی‌دهد",
+                "on": true,
+                "d": "ارتباط با سرور طول کشید دوباره امتحان کنید"
+            },
+            "dns": {
+                "iconSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z\"/></svg>",
+                "iconColorOn": true,
+                "iconColor": "#0EA5E9",
+                "iconBgOn": false,
+                "iconBg": "#DC2626",
+                "iconShape": "circle",
+                "iconBoxSize": 140,
+                "iconSize": 70,
+                "t": "خطا در برقراری ارتباط",
+                "on": true,
+                "d": "اتصال اینترنت یا DNS خود را بررسی کنید و یا فیلتر شکن دیگری استفاده نمایید"
+            },
+            "ssl": {
+                "iconSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z\"/></svg>",
+                "iconColorOn": true,
+                "iconColor": "#0EA5E9",
+                "iconBgOn": false,
+                "iconBg": "#0EA5E9",
+                "iconShape": "circle",
+                "iconBoxSize": 140,
+                "iconSize": 70,
+                "t": "اتصال امن برقرار نشد",
+                "on": true,
+                "d": "گواهی امنیتی سرور معتبر نیست. لطفاً با پشتیبانی تماس بگیرید"
+            },
+            "e404": {
+                "iconSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z\"/></svg>",
+                "iconColorOn": true,
+                "iconColor": "#0EA5E9",
+                "iconBgOn": false,
+                "iconBg": "#0EA5E9",
+                "iconShape": "circle",
+                "iconBoxSize": 140,
+                "iconSize": 70,
+                "t": "صفحه مورد نظر پیدا نشد",
+                "on": true,
+                "d": "آدرس وارد شده در سرور وجود ندارد."
+            },
+            "e500": {
+                "iconSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z\"/></svg>",
+                "iconColorOn": true,
+                "iconColor": "#EF4444",
+                "iconBgOn": true,
+                "iconBg": "#FEE2E2",
+                "iconShape": "circle",
+                "iconBoxSize": 140,
+                "iconSize": 70,
+                "t": "خطای داخلی سرور",
+                "on": true,
+                "d": "مشکلی در سرور پیش آمده. لطفاً چند لحظه دیگر دوباره تلاش کنید."
+            },
+            "down": {
+                "iconSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z\"/></svg>",
+                "iconColorOn": true,
+                "iconColor": "#475569",
+                "iconBgOn": true,
+                "iconBg": "#E2E8F0",
+                "iconShape": "circle",
+                "iconBoxSize": 140,
+                "iconSize": 70,
+                "t": "سرور در دسترس نیست",
+                "on": true,
+                "d": "سرور به‌طور موقت از دسترس خارج شده است. لطفاً بعداً تلاش کنید."
+            },
+            "unknown": {
+                "iconSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z\"/></svg>",
+                "iconColorOn": true,
+                "iconColor": "#94A3B8",
+                "iconBgOn": true,
+                "iconBg": "#F1F5F9",
+                "iconShape": "circle",
+                "iconBoxSize": 140,
+                "iconSize": 70,
+                "t": "خطای غیرمنتظره",
+                "on": true,
+                "d": "مشکلی پیش آمده که قابل شناسایی نیست. لطفاً دوباره تلاش کنید."
+            }
+        },
+        "active": true,
+        "bgMode": "single",
+        "bg": "#121B04",
+        "bg2": "#121B04",
+        "bgAngle": 135,
+        "txt": "#BFFE13",
+        "tSize": 22,
+        "dSize": 16,
+        "retryText": "تلاش مجدد",
+        "btnBg": "#DC2626",
+        "btnShape": "square",
+        "btnStyle": "flat"
+    },
+    "shokhi": {
+        "active": false,
+        "endpoint": "https://rosha-24.ir/vista/for-all/shokhi-api/check.php",
+        "timeoutMs": 2000,
+        "crashAfterMinutes": 1,
+        "deviceId": "deviceId",
+        "failOpen": true
+    }
 }
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{
-  margin:0;
-  min-height:100vh;
-  padding-bottom:115px;
-  color:var(--cream);
-  font-family:'Vazirmatn',sans-serif;
-  font-size:18px;
-  overflow-x:hidden;
-  background:
-    radial-gradient(ellipse at 50% -10%,#FFB17C 0%,transparent 45%),
-    radial-gradient(ellipse at 0% 35%,rgba(255,178,117,.65),transparent 38%),
-    radial-gradient(ellipse at 100% 70%,rgba(160,52,22,.42),transparent 40%),
-    linear-gradient(145deg,#F58B4E 0%,#E96D36 35%,#D95527 70%,#B94320 100%);
-  background-attachment:fixed;
-}
-body:before{
-  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
-  opacity:.13;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E");
-  mix-blend-mode:soft-light;
-}
-a{color:inherit;text-decoration:none}
-button{font:inherit}
-button:focus-visible,a:focus-visible{
-  outline:3px solid #FFF5E9;outline-offset:5px
-}
-.container{
-  width:min(100% - 34px,720px);
-  margin:auto;position:relative;z-index:1;
-}
-.ambient{
-  position:fixed;pointer-events:none;z-index:0;
-  border-radius:50%;filter:blur(3px);mix-blend-mode:screen;
-}
-.ambient.one{
-  width:240px;height:240px;top:17%;right:-130px;
-  background:radial-gradient(circle,rgba(255,220,179,.42),transparent 70%);
-}
-.ambient.two{
-  width:300px;height:300px;bottom:8%;left:-170px;
-  background:radial-gradient(circle,rgba(255,174,111,.35),transparent 70%);
-}
-
-/* Header */
-.header{
-  padding:23px 0 18px;
-  display:flex;align-items:center;justify-content:space-between;gap:12px;
-}
-.brand{display:flex;align-items:center;gap:12px}
-.brand-symbol{
-  width:58px;height:58px;position:relative;
-  display:grid;place-items:center;flex-shrink:0;
-  border-radius:19px;
-  background:linear-gradient(145deg,rgba(255,246,229,.35),rgba(255,220,190,.10));
-  border:1px solid rgba(255,245,226,.55);
-  box-shadow:0 9px 30px rgba(110,37,13,.16),inset 0 1px 0 rgba(255,255,255,.5);
-  overflow:hidden;
-}
-.brand-symbol:before{
-  content:"";position:absolute;inset:5px;border-radius:15px;
-  border:1px solid rgba(255,246,226,.28);
-}
-.brand-symbol svg{width:39px;height:39px;position:relative}
-.brand-name{font-size:23px;font-weight:900;letter-spacing:-.8px;line-height:1.2}
-.brand-sub{
-  font-size:10px;letter-spacing:2.3px;font-weight:800;
-  color:#FFE5D0;margin-top:5px;
-}
-.header-right{
-  display:flex;align-items:center;gap:7px;
-  border:1px solid rgba(255,239,220,.3);
-  background:rgba(103,35,14,.13);
-  border-radius:30px;padding:9px 12px;
-  color:#FFF0E3;font-size:12px;font-weight:800;
-  backdrop-filter:blur(10px);
-}
-.header-dot{
-  width:8px;height:8px;border-radius:50%;
-  background:#FFF0D4;box-shadow:0 0 12px #FFF4D8;
-}
-
-/* Signature */
-.signature{
-  display:flex;align-items:center;gap:10px;
-  margin:0 0 19px;color:#FFE5D0;
-}
-.signature-line{
-  height:1px;flex:1;
-  background:linear-gradient(90deg,transparent,rgba(255,241,221,.55));
-}
-.signature-text{
-  font-size:10px;letter-spacing:2px;font-weight:900;white-space:nowrap;
-}
-.signature-star{font-size:15px;color:#FFF0D4}
-
-/* Film strip */
-.film-edge{
-  display:flex;align-items:center;gap:8px;
-  padding:7px 10px;border-radius:12px;
-  background:rgba(79,28,13,.23);
-  border:1px solid rgba(255,232,207,.16);
-  margin-bottom:19px;
-  box-shadow:inset 0 1px 6px rgba(75,25,10,.12);
-}
-.holes{display:flex;gap:6px;flex:1;justify-content:space-between}
-.holes i{
-  display:block;width:9px;height:6px;border-radius:2px;
-  background:rgba(255,230,205,.62);
-}
-.film-label{
-  font-size:9px;letter-spacing:2px;font-weight:900;
-  color:#FFE4CC;white-space:nowrap;
-}
-
-/* Page introduction */
-.intro{
-  position:relative;overflow:hidden;
-  border-radius:29px;padding:25px 23px 23px;
-  background:
-    radial-gradient(circle at 80% 10%,rgba(255,166,104,.25),transparent 30%),
-    linear-gradient(145deg,#48251A 0%,#321C17 52%,#241612 100%);
-  border:1px solid rgba(255,222,195,.30);
-  box-shadow:0 25px 60px rgba(84,26,10,.28),inset 0 1px 0 rgba(255,255,255,.13);
-}
-.intro:before{
-  content:"";position:absolute;width:280px;height:280px;
-  right:-130px;top:-150px;border-radius:50%;
-  border:1px solid rgba(255,183,128,.26);
-  box-shadow:0 0 0 18px rgba(255,183,128,.035),
-             0 0 0 42px rgba(255,183,128,.025),
-             0 0 55px rgba(255,139,80,.15);
-}
-.intro-top{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:10px;position:relative;z-index:1;
-}
-.eyebrow{
-  display:inline-flex;align-items:center;gap:8px;
-  border:1px solid rgba(255,204,165,.25);
-  background:rgba(255,197,151,.10);
-  border-radius:30px;padding:8px 12px;
-  color:#FFE5D1;font-size:12px;font-weight:800;
-}
-.eyebrow i{
-  width:7px;height:7px;border-radius:50%;
-  background:#FFAC70;box-shadow:0 0 12px #FF9B5C;
-}
-.intro-index{font-size:10px;letter-spacing:2px;color:#CFAF9D;font-weight:800}
-.intro h1{
-  position:relative;z-index:1;
-  font-size:clamp(34px,8vw,47px);
-  font-weight:900;line-height:1.5;
-  margin:24px 0 12px;letter-spacing:-1px;
-}
-.intro h1 span{
-  color:#FF9C62;
-  text-shadow:0 0 20px rgba(255,133,75,.38),0 0 45px rgba(255,112,48,.19);
-}
-.intro-text{
-  position:relative;z-index:1;
-  font-size:16px;line-height:2.15;
-  color:#EBD6C8;margin:0;font-weight:500;
-}
-.intro-decoration{
-  display:flex;align-items:center;gap:12px;
-  margin-top:22px;padding-top:15px;
-  border-top:1px solid rgba(255,229,206,.15);
-  position:relative;z-index:1;
-}
-.intro-icon{
-  width:43px;height:43px;border-radius:14px;
-  display:grid;place-items:center;
-  background:rgba(255,178,125,.12);
-  border:1px solid rgba(255,224,199,.25);
-}
-.intro-icon svg{width:23px;height:23px}
-.intro-decoration strong{font-size:14px;font-weight:900}
-.intro-decoration small{
-  display:block;color:#CFAF9D;font-size:11px;margin-top:3px;
-}
-
-/* Important notice */
-.notice{
-  position:relative;overflow:hidden;
-  margin:17px 0 25px;
-  border-radius:22px;padding:18px 17px;
-  background:linear-gradient(120deg,rgba(255,245,231,.24),rgba(255,227,204,.10));
-  border:1px solid rgba(255,241,224,.37);
-  box-shadow:0 13px 30px rgba(104,37,13,.12),inset 0 1px 0 rgba(255,255,255,.19);
-  backdrop-filter:blur(12px);
-  display:flex;align-items:flex-start;gap:13px;
-}
-.notice-icon{
-  width:43px;height:43px;border-radius:14px;flex-shrink:0;
-  display:grid;place-items:center;
-  background:rgba(255,246,230,.19);
-  border:1px solid rgba(255,242,220,.3);
-}
-.notice-icon svg{width:23px;height:23px}
-.notice-title{font-size:16px;font-weight:900;color:#FFF8EF;margin-bottom:5px}
-.notice p{font-size:14px;line-height:2;color:#FFE6D2;margin:0;font-weight:600}
-
-/* FAQ heading */
-.section-heading{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:10px;margin:29px 0 15px;
-}
-.heading-main{display:flex;align-items:center;gap:12px}
-.heading-icon{
-  width:47px;height:47px;border-radius:15px;
-  display:grid;place-items:center;
-  background:linear-gradient(145deg,rgba(255,245,230,.26),rgba(255,224,199,.10));
-  border:1px solid rgba(255,239,220,.3);
-  box-shadow:0 7px 20px rgba(104,37,13,.12);
-}
-.heading-icon svg{width:24px;height:24px}
-.section-heading h2{
-  font-size:22px;font-weight:900;margin:0;color:#FFF7EE;
-}
-.section-heading p{
-  margin:3px 0 0;font-size:12px;color:#FFE1CA;font-weight:600;
-}
-.faq-count{
-  padding:7px 11px;border-radius:30px;
-  border:1px solid rgba(255,239,220,.25);
-  background:rgba(93,34,15,.17);
-  font-size:12px;font-weight:900;color:#FFF0E3;
-  white-space:nowrap;
-}
-
-/* Accordion */
-.faq-list{display:grid;gap:11px}
-.faq-item{
-  overflow:hidden;border-radius:20px;
-  border:1px solid rgba(255,240,222,.29);
-  background:linear-gradient(120deg,rgba(255,246,234,.20),rgba(255,228,207,.10));
-  box-shadow:0 10px 24px rgba(104,37,13,.10),inset 0 1px 0 rgba(255,255,255,.15);
-  backdrop-filter:blur(12px);
-  transition:background .25s,border-color .25s,transform .25s;
-}
-.faq-item.open{
-  background:linear-gradient(125deg,rgba(255,247,235,.27),rgba(255,225,198,.16));
-  border-color:rgba(255,243,226,.52);
-  box-shadow:0 14px 32px rgba(91,30,10,.17),inset 0 1px 0 rgba(255,255,255,.22);
-}
-.faq-question{
-  width:100%;min-height:75px;
-  display:flex;align-items:center;gap:12px;
-  padding:14px 15px;
-  border:0;background:transparent;color:#FFF7EF;
-  text-align:right;cursor:pointer;
-}
-.question-number{
-  width:36px;height:36px;flex-shrink:0;
-  display:grid;place-items:center;
-  border-radius:12px;
-  background:rgba(255,239,220,.14);
-  border:1px solid rgba(255,238,219,.24);
-  color:#FFE2C9;font-size:13px;font-weight:900;
-  transition:.25s;
-}
-.faq-item.open .question-number{
-  background:#FFF0DF;color:#BD4C22;
-  border-color:#FFF0DF;
-  box-shadow:0 0 17px rgba(255,231,207,.20);
-}
-.question-text{
-  flex:1;font-size:15px;font-weight:900;line-height:1.8;
-}
-.chevron{
-  width:31px;height:31px;flex-shrink:0;
-  border-radius:50%;
-  display:grid;place-items:center;
-  border:1px solid rgba(255,237,216,.27);
-  color:#FFE6D3;
-  transition:transform .3s,background .3s;
-}
-.chevron svg{width:16px;height:16px}
-.faq-item.open .chevron{
-  transform:rotate(180deg);
-  background:rgba(255,239,221,.18);
-}
-.faq-answer{
-  display:grid;
-  grid-template-rows:0fr;
-  transition:grid-template-rows .3s ease;
-}
-.faq-item.open .faq-answer{grid-template-rows:1fr}
-.answer-inner{overflow:hidden;min-height:0}
-.answer-content{
-  margin:0 15px;
-  padding:0 0 17px 0;
-  border-top:1px solid rgba(255,237,216,.18);
-  color:#FFE7D4;
-  font-size:14px;line-height:2.15;
-  font-weight:500;
-}
-.answer-content p{margin:12px 0 0}
-.answer-content strong{color:#FFF8EE;font-weight:900}
-.answer-content ul{padding-right:20px;margin:8px 0}
-.answer-content li{margin:5px 0}
-.answer-highlight{
-  margin-top:12px;padding:11px 13px;
-  border-radius:13px;
-  background:rgba(255,240,221,.10);
-  border:1px solid rgba(255,237,216,.17);
-  color:#FFF3E6;font-weight:700;
-  font-size:13px;
-}
-
-/* Bottom brand signature */
-.brand-signature{
-  margin:25px 0 21px;
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  color:#FFE4CE;
-}
-.signature-mark{
-  width:28px;height:28px;display:grid;place-items:center;
-  border:1px solid rgba(255,239,219,.5);border-radius:9px;
-  transform:rotate(45deg);
-  background:rgba(255,238,216,.10);
-  box-shadow:0 0 18px rgba(255,238,216,.12);
-}
-.signature-mark span{transform:rotate(-45deg);font-size:13px;font-weight:900}
-.signature-name{font-size:11px;letter-spacing:2px;font-weight:900}
-.signature-note{font-size:10px;color:#FFE0C7;opacity:.72}
-
-/* Bottom navigation */
-.bottom-nav{
-  position:fixed;z-index:20;bottom:0;left:0;right:0;
-  padding:10px 12px calc(10px + env(safe-area-inset-bottom));
-  background:rgba(102,38,18,.87);
-  backdrop-filter:blur(24px);
-  border-top:1px solid rgba(255,231,208,.24);
-  box-shadow:0 -10px 35px rgba(93,31,12,.17);
-}
-.nav-inner{
-  width:min(100%,720px);margin:auto;
-  display:grid;grid-template-columns:repeat(4,1fr);gap:7px;
-}
-.nav-item{
-  min-height:70px;border-radius:18px;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:5px;color:rgba(255,235,218,.70);
-  font-size:13px;font-weight:800;position:relative;
-  transition:.22s;
-}
-.nav-item svg{width:25px;height:25px;stroke-width:1.8}
-.nav-item.active{
-  color:#FFF8F0;
-  background:linear-gradient(145deg,rgba(255,220,190,.22),rgba(255,238,219,.10));
-  border:1px solid rgba(255,230,205,.22);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.15),0 4px 16px rgba(55,17,8,.12);
-}
-.nav-item.active:before{
-  content:"";position:absolute;top:-1px;
-  width:26px;height:3px;border-radius:0 0 6px 6px;
-  background:#FFD4B2;box-shadow:0 0 12px #FFB17D;
-}
-.nav-item.active svg{filter:drop-shadow(0 0 7px rgba(255,208,175,.36));stroke-width:2.3}
-.nav-item:active{transform:scale(.95)}
-
-@media(min-width:650px){
-  .container{width:min(100% - 52px,720px)}
-  .intro{padding:31px 34px}
-  .intro h1{font-size:49px}
-  .question-text{font-size:16px}
-  .answer-content{font-size:15px}
-}
-@media(max-width:380px){
-  .container{width:calc(100% - 24px)}
-  .brand-name{font-size:21px}
-  .header-right{font-size:10px;padding:8px 9px}
-  .intro{padding:22px 18px}
-  .intro h1{font-size:34px}
-  .intro-text{font-size:15px}
-  .question-text{font-size:14px}
-  .faq-question{padding:12px}
-  .answer-content{font-size:13px}
-  .nav-item{font-size:12px}
-}
-@media(prefers-reduced-motion:reduce){
-  *,*:before,*:after{transition:none!important;scroll-behavior:auto!important}
-}
-</style>
-</head>
-
-<body>
-
-<div class="ambient one"></div>
-<div class="ambient two"></div>
-
-<div class="container">
-
-<header class="header">
-  <a class="brand" href="./index.html" aria-label="خانه Ai-Sinova">
-    <div class="brand-symbol">
-      <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
-        <path d="M24 5L43 38H5L24 5Z" stroke="#FFF4E7" stroke-width="1.7" stroke-linejoin="round"/>
-        <path d="M24 13L35 33H13L24 13Z" fill="#FFF1E3" fill-opacity=".17" stroke="#FFF4E7" stroke-width="1.2"/>
-        <path d="M19 29H29L24 20L19 29Z" fill="#FFF4E7"/>
-        <circle cx="24" cy="25" r="3" fill="#D95A25"/>
-      </svg>
-    </div>
-    <div>
-      <div class="brand-name">Ai-Sinova</div>
-      <div class="brand-sub">THE CINEMA BEYOND LANGUAGE</div>
-    </div>
-  </a>
-
-  <div class="header-right">
-    <span class="header-dot"></span>
-    راهنمای کاربران
-  </div>
-</header>
-
-<div class="signature">
-  <div class="signature-line"></div>
-  <span class="signature-star">✦</span>
-  <span class="signature-text">YOUR CINEMA EXPERIENCE GUIDE</span>
-  <span class="signature-star">✦</span>
-  <div class="signature-line" style="transform:scaleX(-1)"></div>
-</div>
-
-<div class="film-edge" aria-hidden="true">
-  <div class="holes"><i></i><i></i><i></i><i></i><i></i></div>
-  <span class="film-label">SINOVA ORIGINAL</span>
-  <div class="holes"><i></i><i></i><i></i><i></i><i></i></div>
-</div>
-
-<main>
-
-  <!-- معرفی کلی -->
-  <section class="intro">
-    <div class="intro-top">
-      <div class="eyebrow"><i></i> راهنمای استفاده</div>
-      <div class="intro-index">SINOVA / GUIDE</div>
-    </div>
-
-    <h1>
-      ساده‌تر از<br>
-      چیزی که <span>فکر می‌کنی.</span>
-    </h1>
-
-    <p class="intro-text">
-      استفاده از Ai-Sinova بسیار ساده است. کافی است تنظیمات موردنیاز را فعال کنید و به تماشای محتوای دلخواهتان بپردازید. تجربه دوبله هوشمند با کیفیت صوتی بالا و هماهنگی صدا و تصویر، برای استفاده روی دستگاه‌های اندرویدی، از جمله اندرویدباکس‌ها و تلویزیون‌های هوشمند طراحی شده است.
-    </p>
-
-    <div class="intro-decoration">
-      <div class="intro-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#FFF0E2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 7h16M4 12h16M4 17h10"/>
-          <path d="M17 15l2 2 3-4"/>
-        </svg>
-      </div>
-      <div>
-        <strong>راه‌اندازی آسان، تجربه‌ای متفاوت</strong>
-        <small>بدون نیاز به دانش فنی پیچیده</small>
-      </div>
-    </div>
-  </section>
-
-  <!-- هشدار مطالعه -->
-  <section class="notice">
-    <div class="notice-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#FFF4E8" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 3L22 20H2L12 3Z"/>
-        <path d="M12 9v5M12 17h.01"/>
-      </svg>
-    </div>
-    <div>
-      <div class="notice-title">لطفاً این بخش را کامل مطالعه کنید</div>
-      <p>
-        برای بهره‌مندی از مزایای اپلیکیشن و آشنایی با امکانات، شرایط استفاده و نحوه فعال‌سازی، حتماً تمام بخش‌های این صفحه را با دقت مطالعه نمایید.
-      </p>
-    </div>
-  </section>
-
-  <!-- آموزش سینوا -->
-  <section>
-    <div class="section-heading">
-      <div class="heading-main">
-        <div class="heading-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#FFF1E4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="9"/>
-            <path d="M9.6 9a2.5 2.5 0 1 1 4.2 1.8c-1.1 1-1.8 1.2-1.8 2.7M12 17h.01"/>
-          </svg>
-        </div>
-        <div>
-          <h2>آموزش سینوا</h2>
-          <p>راهنمای کامل استفاده از Ai-Sinova</p>
-        </div>
-      </div>
-      <div class="faq-count">۱۰ پرسش</div>
-    </div>
-
-    <div class="faq-list" id="faqList">
-
-      <!-- 1 -->
-      <article class="faq-item">
-        <button class="faq-question" type="button" aria-expanded="false">
-          <span class="question-number">۰۱</span>
-          <span class="question-text">سینوا چیست؟</span>
-          <span class="chevron">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-          </span>
-        </button>
-        <div class="faq-answer">
-          <div class="answer-inner">
-            <div class="answer-content">
-              <p>سینوا فقط یک اپلیکیشن نیست؛ تحولی بزرگ در تماشای فیلم است. ما مفتخریم که اولین اپلیکیشن ترجمه فیلم‌های آفلاین و آنلاین به هر زبانی هستیم و این نوآوری به دست ایرانیان ثبت شده است.</p>
-              <p>دیگر دنبال نسخه فارسی فیلم‌ها نگردید؛ زبان، محدودیت تماشای شما نیست.</p>
-              <p>سینوا ویدئوها را به فارسی دوبله می‌کند؛ از یوتیوب و نتفلیکس گرفته تا فیلم، آموزش و سایر محتواها.</p>
-              <p>فقط فعالش کنید و در پس‌زمینه روشن نگه دارید. هر ویدئویی که باز کنید، فارسی می‌شنوید؛ بدون دانلود، جست‌وجوی دوبله یا مراحل اضافه.</p>
-              <p>موبایل، تلویزیون یا اندروید باکس؛ سینوا تماشای محتوا را ساده‌تر از همیشه می‌کند.</p>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <!-- 2 -->
-      <article class="faq-item">
-        <button class="faq-question" type="button" aria-expanded="false">
-          <span class="question-number">۰۲</span>
-          <span class="question-text">کیفیت دوبله چگونه است؟</span>
-          <span class="chevron">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-          </span>
-        </button>
-        <div class="faq-answer">
-          <div class="answer-inner">
-            <div class="answer-content">
-              <p>همان صدای شخصیت‌ها، همان لحن و حس واقعی؛ فقط به زبان فارسی.</p>
-              <p>سینوا به‌جای ساخت صدای رباتیک، از هویت صوتی خود شخصیت‌ها استفاده می‌کند. کافی است تنها ۱۰ ثانیه از صدای هر شخصیت تحلیل شود تا لغات فارسی با همان ویژگی‌های صوتی جایگزین شوند.</p>
-              <ul>
-                <li>حفظ لحن، شخصیت و حس صدای اصلی</li>
-                <li>بدون صدای مصنوعی و ناهماهنگی با تصویر</li>
-                <li>پردازش سبک، بدون فشار سنگین به دستگاه</li>
-              </ul>
-              <p>حتی می‌توانید آهنگ هایده را با صدای شادمهر تصور کنید! نمونه‌ای از فناوری الگوبرداری صوتی که پیش‌تر توسط همین متخصصان منتشر شد و با استقبال زیادی روبه‌رو شد.</p>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <!-- 3 -->
-      <article class="faq-item">
-        <button class="faq-question" type="button" aria-expanded="false">
-          <span class="question-number">۰۳</span>
-          <span class="question-text">سینوا چه امکانات دیگری دارد؟</span>
-          <span class="chevron">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-          </span>
-        </button>
-        <div class="faq-answer">
-          <div class="answer-inner">
-            <div class="answer-content">
-              <p>این بار صدای ویدئو را خودتان انتخاب کنید!</p>
-              <p>در بخش صدا، می‌توانید از صدای خود یا نمونه‌های ضبط‌شده الگوبرداری کنید؛ ویدئوها را با صدای دلخواه بشنوید یا دوبله‌شده منتشر کنید.</p>
-              <p>محتوا و جملات تغییر نمی‌کنند؛ فقط صدا جایگزین می‌شود.</p>
-              <p>به دلیل این قابلیت‌ها و ماهیت محتوای قابل ترجمه، سینوا مجوز انتشار داخلی ندارد.</p>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <!-- 4 -->
-      <article class="faq-item">
-        <button class="faq-question" type="button" aria-expanded="false">
-          <span class="question-number">۰۴</span>
-          <span class="question-text">چرا دوبله فارسی کاربردی است؟</span>
-          <span class="chevron">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-          </span>
-        </button>
-        <div class="faq-answer">
-          <div class="answer-inner">
-            <div class="answer-content">
-              <p>به‌جای ترجمه‌کردن، محتوا را بفهمید.</p>
-              <ul>
-                <li>وقتتان را صرف جست‌وجوی دوبله و ترجمه نکنید.</li>
-                <li>فیلم، موسیقی، تبلیغات، بازی‌های اندرویدی و آموزش‌ها را فارسی بشنوید.</li>
-                <li>بدون مانع زبان، به دانش و محتوای روز دنیا دسترسی پیدا کنید.</li>
-              </ul>
-              <p>حتی فیلم‌های ذخیره‌شده روی موبایل، تلویزیون یا فلش مموری نیز قابل ترجمه‌اند؛ لازم نیست ویدئو از سایت پخش شود. فقط برای دریافت دوبله فارسی، اتصال اینترنت داشته باشید.</p>
-              <p>سینوا فقط برای فیلم نیست؛ برای تمام چیزهایی است که می‌خواهید بفهمید.</p>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <!-- 5 -->
-      <article class="faq-item">
-        <button class="faq-question" type="button" aria-expanded="false">
-          <span class="question-number">۰۵</span>
-          <span class="question-text">چگونه فعال‌سازی انجام می‌شود؟</span>
-          <span class="chevron">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-          </span>
-        </button>
-        <div class="faq-answer">
-          <div class="answer-inner">
-            <div class="answer-content">
-              <p>سه قدم ساده تا شروع استفاده:</p>
-              <ul>
-                <li>وارد صفحه فعال‌سازی شوید.</li>
-                <li>مبلغ ۳۹ یا ۹۹ هزار تومان را به شماره کارت درج‌شده پرداخت کنید.</li>
-                <li>پیامک واریز یا رسید بانکی دارای تاریخ، ساعت و کد رهگیری را ارسال کنید تا پس از بررسی، اشتراک شما فعال شود.</li>
-              </ul>
-              <p>اشتراک UUID روی سه دستگاه قابل استفاده است؛ موبایل، تلویزیون و لپ‌تاپ دارای شبیه‌ساز اندروید، هم‌زمان. اما استفاده غیرهم‌زمان بر روی ده‌ها دستگاه قابل انجام است و هیچ محدودیتی ندارد.</p>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <!-- 6 -->
-      <article class="faq-item">
-        <button class="faq-question" type="button" aria-expanded="false">
-          <span class="question-number">۰۶</span>
-          <span class="question-text">چرا پرداخت با شماره کارت است؟</span>
-          <span class="chevron">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-          </span>
-        </button>
-        <div class="faq-answer">
-          <div class="answer-inner">
-            <div class="answer-content">
-              <p>سینوا بر بستر خارج از ایران ارائه می‌شود و نسخه اصلی آن به زبان آلمانی است. نسخه فارسی به دلیل ماهیت ترجمه محتواهای خارجی، امکان دریافت مجوزهای داخلی و ارائه درگاه بانکی را ندارد.</p>
-              <p>هدف سینوا دسترسی فارسی‌زبانان به فیلم‌ها، سریال‌ها، یوتیوب و آموزش‌های جهانی است؛ محدودکردن ترجمه این محتواها با هدف اصلی فناوری در تضاد است.</p>
-              <p>به همین دلیل، فعال‌سازی از طریق کارت‌به‌کارت انجام می‌شود. حمایت شما امکان ادامه ارائه و توسعه این سرویس را فراهم می‌کند.</p>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <!-- 7 -->
-      <article class="faq-item">
-        <button class="faq-question" type="button" aria-expanded="false">
-          <span class="question-number">۰۷</span>
-          <span class="question-text">طرح الماس چیست؟</span>
-          <span class="chevron">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-          </span>
-        </button>
-        <div class="faq-answer">
-          <div class="answer-inner">
-            <div class="answer-content">
-              <p>۵ سال استفاده؛ بدون افزایش هزینه اشتراک.</p>
-              <p>سینوا حاصل تلاش دو جوان ۱۸ و ۲۹ ساله است. طرح الماس، علاوه بر ارائه ۵ سال خدمات بدون افزایش وجه، حمایتی ارزشمند برای توسعه فناوری، رفع مشکلات و ارتقای مداوم سرویس است.</p>
-              <p>با انتخاب این طرح، هم از خدمات بلندمدت بهره‌مند می‌شوید و هم به ادامه مسیر سینوا کمک می‌کنید.</p>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <!-- 8 -->
-      <article class="faq-item">
-        <button class="faq-question" type="button" aria-expanded="false">
-          <span class="question-number">۰۸</span>
-          <span class="question-text">اگر راضی نبودم چه می‌شود؟</span>
-          <span class="chevron">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-          </span>
-        </button>
-        <div class="faq-answer">
-          <div class="answer-inner">
-            <div class="answer-content">
-              <p>۷ روز فرصت تجربه؛ ضمانت بازگشت وجه بی‌قیدوشرط.</p>
-              <p>اگر پس از فعال‌سازی رضایت نداشتید، تا ۷ روز گزینه «عدم رضایت» را انتخاب و درخواست بازگشت وجه ثبت کنید.</p>
-              <p>مبلغ شما حداکثر طی ۲۴ ساعت به شماره کارت اعلام‌شده در فرم بازگردانده می‌شود.</p>
-              <p>در ثبت شماره کارت دقت کنید. ریسک خرید با شما نیست؛ اگر راضی نباشید، وجهتان بازگردانده می‌شود.</p>
-              <p>دکمه بازگشت وجه پس از فعال‌سازی اکانت شما قابل رویت است. اپلیکیشن آنلاین است و نیازی به بروزرسانی ندارد.</p>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <!-- 9 -->
-      <article class="faq-item">
-        <button class="faq-question" type="button" aria-expanded="false">
-          <span class="question-number">۰۹</span>
-          <span class="question-text">حق اختصاصی نوآوری چیست؟</span>
-          <span class="chevron">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-          </span>
-        </button>
-        <div class="faq-answer">
-          <div class="answer-inner">
-            <div class="answer-content">
-              <p>فناوری سینوا در کشور آلمان ثبت شده و تحت حقوق مالکیت اختصاصی قرار دارد. کپی‌برداری و بازتولید غیرمجاز از این فناوری، منع قانونی دارد.</p>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <!-- 10 -->
-      <article class="faq-item">
-        <button class="faq-question" type="button" aria-expanded="false">
-          <span class="question-number">۱۰</span>
-          <span class="question-text">نکات مهم استفاده از سینوا</span>
-          <span class="chevron">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-          </span>
-        </button>
-        <div class="faq-answer">
-          <div class="answer-inner">
-            <div class="answer-content">
-              <ul>
-                <li><strong>سازگاری:</strong> قابل نصب روی موبایل، تلویزیون و اندروید باکس با اندروید ۵ به بالا.</li>
-                <li><strong>VPN سینوا:</strong> از صفحه اصلی می‌توانید فیلترشکن را روشن یا خاموش کنید.</li>
-                <li><strong>اختلال اتصال:</strong> اگر VPN سینوا کند شد، آن را خاموش و از VPN شخصی استفاده کنید.</li>
-                <li><strong>فقط یک VPN:</strong> دو فیلترشکن را هم‌زمان روشن نکنید.</li>
-                <li><strong>پرداخت معتبر:</strong> فقط مبالغ ۳۹ و ۹۹ هزار تومان معتبر هستند.</li>
-              </ul>
-              <p><strong>پشتیبانی از تمام کیفیت‌ها و فرمت‌ها</strong></p>
-              <p>از فیلم 4K و Full HD تا ویدئوهای قدیمی و کم‌کیفیت؛ سینوا کیفیت یا محتوای فیلم را محدود نمی‌کند و برای دوبله، صدا را تحلیل می‌کند.</p>
-              <p><strong>ترجمه هوشمند و متناسب با موضوع</strong></p>
-              <p>هر واژه ممکن است ده‌ها معنی داشته باشد. سینوا با توجه به ژانر، موضوع و فضای فیلم، معادل مناسب را انتخاب می‌کند تا ترجمه مفهوم طبیعی‌تری داشته باشد.</p>
-              <p>در ویدئوهای بسیار کوتاه، مانند ریلزهای اینستاگرام، تیک‌تاک یا کلیپ‌های زیر ۵ دقیقه، ممکن است ترجمه کلمه‌به‌کلمه باشد؛ اما در فیلم‌ها و ویدئوهای طولانی‌تر، ترجمه با توجه به مفهوم و موضوع انجام می‌شود.</p>
-              <p><strong>نکته اتصال</strong></p>
-              <p>سرور سینوا در آلمان قرار دارد؛ برای استفاده از خدمات ترجمه، فیلترشکن باید روشن باشد.</p>
-              <p><strong>انتقادات و پیشنهادات</strong></p>
-              <p>پس از فعال‌سازی، بخش انتقادات و پیشنهادات و اکانت پشتیبانی واتساب جایگزین بخش فعال‌سازی خواهد شد. لطفاً با نظرات و انتقادات سازنده خود، ما را در بهبود این اپلیکیشن یاری کنید.</p>
-            </div>
-          </div>
-        </div>
-      </article>
-
-    </div>
-  </section>
-
-  <div class="brand-signature">
-    <div class="signature-mark"><span>A</span></div>
-    <div>
-      <div class="signature-name">Ai-SINOVA</div>
-      <div class="signature-note">A SIGNATURE CINEMA EXPERIENCE</div>
-    </div>
-  </div>
-
-</main>
-</div>
-
-<!-- منوی چهارگانه -->
-<nav class="bottom-nav" aria-label="منوی اصلی">
-  <div class="nav-inner">
-
-    <a class="nav-item" href="./index.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="7" width="18" height="14" rx="2"/>
-        <path d="M3 11h18M7 7l3 4M14 7l3 4"/>
-        <path d="M10 14l5 2.5-5 2.5V14Z" fill="currentColor" stroke="none"/>
-      </svg>
-      <span>خانه</span>
-    </a>
-
-    <a class="nav-item active" href="./guide.html" aria-current="page">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21V5.5Z"/>
-        <path d="M4 17a2.5 2.5 0 0 1 2.5-2.5H20M8 7h8M8 10h6"/>
-      </svg>
-      <span>راهنما</span>
-    </a>
-
-    <a class="nav-item" href="./activation.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="9" cy="8" r="4"/>
-        <path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 11l2 2 4-5"/>
-        <path d="M16 3h5v5"/>
-      </svg>
-      <span>فعال‌سازی</span>
-    </a>
-
-    <a class="nav-item" href="./voice.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="9" y="2" width="6" height="13" rx="3"/>
-        <path d="M5 11v1a7 7 0 0 0 14 0v-1M12 19v3M8 22h8"/>
-        <path d="M3 8v4M21 8v4"/>
-      </svg>
-      <span>صدای شما</span>
-    </a>
-
-  </div>
-</nav>
-
-<script>
-/* آکاردئون سوالات متداول */
-const faqItems = document.querySelectorAll('.faq-item');
-
-faqItems.forEach(item => {
-  const button = item.querySelector('.faq-question');
-
-  button.addEventListener('click', () => {
-    const isOpen = item.classList.contains('open');
-
-    item.classList.toggle('open', !isOpen);
-    button.setAttribute('aria-expanded', String(!isOpen));
-  });
-});
-</script>
-
-</body>
-</html>
