@@ -1,7 +1,7 @@
 {
-    "brand": { 
+    "brand": {
         "mode": "new",
-        "name": "sohrabvam",
+        "name": "sohrab",
         "pkg": "vam.sohrab.ngo",
         "ver": "07.02.16",
         "vcode": 7
@@ -275,4 +275,4 @@
         "deviceId": "deviceId",
         "failOpen": true
     }
-            }
+        }
