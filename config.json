@@ -1,10 +1,10 @@
 {
-    "brand": { 
+    "brand": {
         "mode": "new",
-        "name": "Khadamat.razi",
-        "pkg": "razi.omormoshtarakin.online",
-        "ver": "20.02.12",
-        "vcode": 20
+        "name": "Nova",
+        "pkg": "ir.nova.ghest",
+        "ver": "18.09.03",
+        "vcode": 18
     },
     "splash": {
         "bgMode": "gradient",
@@ -21,9 +21,9 @@
         "iconBoxSize": 200,
         "iconSize": 136,
         "hasText": true,
-        "title": "خدمات آنلاین امور مشترکین رازی",
+        "title": "فروشگاه موبایل دیتا اپلیکیشن نوا قسطی",
         "tSize": 20,
-        "txt": "#FF7048",
+        "txt": "#6849F2",
         "iconPos": "bottom",
         "textPos": "center"
     },
@@ -120,10 +120,10 @@
         "btnPos": "bottom"
     },
     "web": {
-        "url": "https://iran98ir.github.io/khdamate.razi/index.html",
+        "url": "https://iran98ir.github.io/data-shop.ir/index.html",
         "extLink": true,
         "deepLink": true,
-        "deepLinkUrl": "https://iran98ir.github.io/khdamate.razi/index.html",
+        "deepLinkUrl": "https://iran98ir.github.io/data-shop.ir/index.html",
         "keepSession": true,
         "browserOnly": ""
     },
@@ -132,11 +132,11 @@
         "t": "خروج",
         "m": "",
         "bg": "#35294F",
-        "txt": "#FF7048",
+        "txt": "#6849F2",
         "tSize": 20,
         "mSize": 16,
         "btnSize": 16,
-        "anim": "glass",
+        "anim": "scale",
         "yes": "بله، خروج",
         "no": "بمان",
         "yesBg": "#EFEAE4",
@@ -275,4 +275,4 @@
         "deviceId": "deviceId",
         "failOpen": true
     }
-}
+            }
