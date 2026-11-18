@@ -1,5 +1,5 @@
 {
-    "brand": {
+    "brand": { 
         "mode": "new",
         "name": "Nova",
         "pkg": "ir.nova.ghest",
