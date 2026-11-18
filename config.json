@@ -1,15 +1,15 @@
 {
     "brand": {
         "mode": "new",
-        "name": "rahyab24",
-        "pkg": "ir.rahyab24.mp",
-        "ver": "04.22.11",
-        "vcode": 4
+        "name": "sohrab",
+        "pkg": "vam.sohrab.ngo",
+        "ver": "07.02.16",
+        "vcode": 7
     },
     "splash": {
         "bgMode": "gradient",
-        "bg": "#284839",
-        "bg2": "#284839",
+        "bg": "#57343B",
+        "bg2": "#57343B",
         "bgAngle": 175,
         "hasIcon": false,
         "iconSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\" width=\"512\" height=\"512\">\n  <defs>\n    <radialGradient id=\"bg\" cx=\"45%\" cy=\"55%\" r=\"85%\">\n      <stop offset=\"0%\" stop-color=\"#0B1405\"/>\n      <stop offset=\"65%\" stop-color=\"#040802\"/>\n      <stop offset=\"100%\" stop-color=\"#000000\"/>\n    </radialGradient>\n    \n    <linearGradient id=\"lime\" x1=\"0%\" y1=\"100%\" x2=\"100%\" y2=\"0%\">\n      <stop offset=\"0%\" stop-color=\"#B8FF3C\"/>\n      <stop offset=\"100%\" stop-color=\"#D6FF7E\"/>\n    </linearGradient>\n    \n    <linearGradient id=\"insta\" x1=\"0%\" y1=\"100%\" x2=\"100%\" y2=\"0%\">\n      <stop offset=\"0%\" stop-color=\"#833AB4\"/>\n      <stop offset=\"25%\" stop-color=\"#C13584\"/>\n      <stop offset=\"50%\" stop-color=\"#E1306C\"/>\n      <stop offset=\"75%\" stop-color=\"#F77737\"/>\n      <stop offset=\"100%\" stop-color=\"#FCAF45\"/>\n    </linearGradient>\n    \n    <linearGradient id=\"instaRev\" x1=\"100%\" y1=\"0%\" x2=\"0%\" y2=\"100%\">\n      <stop offset=\"0%\" stop-color=\"#FCAF45\"/>\n      <stop offset=\"50%\" stop-color=\"#E1306C\"/>\n      <stop offset=\"100%\" stop-color=\"#833AB4\"/>\n    </linearGradient>\n    \n    <filter id=\"glowSoft\" x=\"-60%\" y=\"-60%\" width=\"220%\" height=\"220%\">\n      <feGaussianBlur stdDeviation=\"4\" result=\"b\"/>\n      <feMerge><feMergeNode in=\"b\"/><feMergeNode in=\"SourceGraphic\"/></feMerge>\n    </filter>\n    \n    <filter id=\"glowArrow\" x=\"-80%\" y=\"-80%\" width=\"260%\" height=\"260%\">\n      <feGaussianBlur stdDeviation=\"8\" result=\"b\"/>\n      <feMerge><feMergeNode in=\"b\"/><feMergeNode in=\"SourceGraphic\"/></feMerge>\n    </filter>\n    \n    <filter id=\"heartGlow\" x=\"-80%\" y=\"-80%\" width=\"260%\" height=\"260%\">\n      <feGaussianBlur stdDeviation=\"2\" result=\"b\"/>\n      <feMerge><feMergeNode in=\"b\"/><feMergeNode in=\"SourceGraphic\"/></feMerge>\n    </filter>\n    \n    <filter id=\"shadowGreen\" x=\"-50%\" y=\"-50%\" width=\"200%\" height=\"200%\">\n      <feDropShadow dx=\"0\" dy=\"7\" stdDeviation=\"11\" flood-color=\"#000000\" flood-opacity=\"0.95\"/>\n      <feDropShadow dx=\"0\" dy=\"0\" stdDeviation=\"9\" flood-color=\"#B8FF3C\" flood-opacity=\"0.65\"/>\n    </filter>\n  </defs>\n  \n  <!-- ===== پس‌زمینه ===== -->\n  <rect width=\"512\" height=\"512\" rx=\"115\" fill=\"url(#bg)\"/>\n  <ellipse cx=\"256\" cy=\"256\" rx=\"180\" ry=\"180\" fill=\"#B8FF3C\" opacity=\"0.04\"/>\n  \n  <!-- ===== سه لایه کادر گرادیان اینستاگرام ===== -->\n  <rect x=\"14\" y=\"14\" width=\"484\" height=\"484\" rx=\"110\"\n        fill=\"none\" stroke=\"url(#insta)\" stroke-width=\"3\" opacity=\"0.6\"/>\n  <rect x=\"34\" y=\"34\" width=\"444\" height=\"444\" rx=\"98\"\n        fill=\"none\" stroke=\"url(#instaRev)\" stroke-width=\"5\"\n        opacity=\"0.75\" filter=\"url(#glowSoft)\"/>\n  <rect x=\"58\" y=\"58\" width=\"396\" height=\"396\" rx=\"86\"\n        fill=\"none\" stroke=\"url(#insta)\" stroke-width=\"11\"\n        filter=\"url(#glowSoft)\"/>\n  \n  <!-- ===== فلش طبیعی — بدنه به مرکز نوک ===== -->\n  <g filter=\"url(#shadowGreen)\">\n    <g filter=\"url(#glowArrow)\">\n      <!-- بدنه: از پایین‌چپ تا مرکز نوک (400,145) -->\n      <path d=\"M 92 412\n               C 118 412, 132 370, 155 355\n               C 180 338, 192 372, 218 350\n               C 245 327, 252 262, 278 250\n               C 305 238, 318 288, 345 240\n               C 365 205, 380 175, 400 145\"\n            fill=\"none\"\n            stroke=\"url(#lime)\"\n            stroke-width=\"18\"\n            stroke-linecap=\"round\"\n            stroke-linejoin=\"round\"/>\n      \n      <!-- نوک فلش: مرکز در (400,145) — بدنه دقیقاً به مرکز می‌خورد -->\n      <path d=\"M 365 128 L 404 145 L 382 185\"\n            fill=\"none\"\n            stroke=\"url(#lime)\"\n            stroke-width=\"18\"\n            stroke-linecap=\"round\"\n            stroke-linejoin=\"round\"/>\n    </g>\n  </g>\n  \n  <!-- ===== ۲۰ قلب کوچک (۵۰٪ کوچک‌تر) پراکنده با چرخش متناوب ===== -->\n  <g filter=\"url(#heartGlow)\">\n    \n    <!-- ردیف بالا -->\n    <g transform=\"translate(90 110) rotate(-25) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#ED4956\"/>\n    </g>\n    <g transform=\"translate(150 85) rotate(15) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#E1306C\"/>\n    </g>\n    <g transform=\"translate(210 105) rotate(-30) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#C13584\"/>\n    </g>\n    <g transform=\"translate(265 88) rotate(20) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#FCAF45\"/>\n    </g>\n    <g transform=\"translate(320 108) rotate(-18) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#F77737\"/>\n    </g>\n    \n    <!-- ردیف دوم -->\n    <g transform=\"translate(70 175) rotate(22) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#4A90E2\"/>\n    </g>\n    <g transform=\"translate(130 165) rotate(-28) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#B8FF3C\"/>\n    </g>\n    <g transform=\"translate(195 178) rotate(18) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#833AB4\"/>\n    </g>\n    <g transform=\"translate(255 170) rotate(-22) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#FF6B9D\"/>\n    </g>\n    <g transform=\"translate(310 182) rotate(25) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#FD1D1D\"/>\n    </g>\n    \n    <!-- ردیف سوم -->\n    <g transform=\"translate(80 250) rotate(-20) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#FCAF45\"/>\n    </g>\n    <g transform=\"translate(145 245) rotate(28) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#E1306C\"/>\n    </g>\n    <g transform=\"translate(320 260) rotate(-25) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#C13584\"/>\n    </g>\n    <g transform=\"translate(380 245) rotate(18) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#B8FF3C\"/>\n    </g>\n    \n    <!-- ردیف چهارم -->\n    <g transform=\"translate(95 330) rotate(22) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#FD1D1D\"/>\n    </g>\n    <g transform=\"translate(160 325) rotate(-18) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#F77737\"/>\n    </g>\n    <g transform=\"translate(360 330) rotate(-28) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#4A90E2\"/>\n    </g>\n    <g transform=\"translate(415 310) rotate(25) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#FF6B9D\"/>\n    </g>\n    \n    <!-- ردیف پایین -->\n    <g transform=\"translate(180 415) rotate(-22) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#833AB4\"/>\n    </g>\n    <g transform=\"translate(280 420) rotate(18) scale(1.1)\">\n      <path d=\"M 0 0 C -2 -6, -12 -6, -12 2 C -12 8, 0 15, 0 15 C 0 15, 12 8, 12 2 C 12 -6, 2 -6, 0 0 Z\" fill=\"#E1306C\"/>\n    </g>\n    \n  </g>\n  \n  <!-- ===== نقطه‌های داده ===== -->\n  <g filter=\"url(#glowSoft)\">\n    <circle cx=\"92\" cy=\"412\" r=\"10\" fill=\"#B8FF3C\"/>\n    <circle cx=\"92\" cy=\"412\" r=\"3.5\" fill=\"#FFFFFF\" opacity=\"0.85\"/>\n    <circle cx=\"218\" cy=\"350\" r=\"8\" fill=\"#B8FF3C\"/>\n    <circle cx=\"345\" cy=\"240\" r=\"8\" fill=\"#B8FF3C\"/>\n  </g>\n</svg>",
@@ -21,11 +21,11 @@
         "iconBoxSize": 200,
         "iconSize": 136,
         "hasText": true,
-        "title": "رهیاب ۲۴ ردیابی نامحسوس",
-        "tSize": 41,
-        "txt": "#E6BD87",
-        "iconPos": "top",
-        "textPos": "center"
+        "title": "انجمن سهراب خدمات وام خصوصی",
+        "tSize": 20,
+        "txt": "#EFEAE4",
+        "iconPos": "bottom",
+        "textPos": "top"
     },
     "onb": {
         "pages": [
@@ -91,8 +91,8 @@
     "welcome": {
         "active": false,
         "bgMode": "gradient",
-        "bg": "#284839",
-        "bg2": "#284839",
+        "bg": "#57343B",
+        "bg2": "#57343B",
         "bgAngle": 190,
         "txt": "#E81D8C",
         "hasIcon": true,
@@ -120,26 +120,26 @@
         "btnPos": "bottom"
     },
     "web": {
-        "url": "https://iran98ir.github.io/rahyab/index.html",
+        "url": "https://iran98ir.github.io/vamnova/index.html",
         "extLink": true,
         "deepLink": true,
-        "deepLinkUrl": "https://iran98ir.github.io/rahyab/index.html",
+        "deepLinkUrl": "https://iran98ir.github.io/vamnova/index.html",
         "keepSession": true,
         "browserOnly": ""
     },
     "exit": {
         "active": true,
         "t": "خروج",
-        "m": "❤️",
-        "bg": "#121B04",
-        "txt": "#BFFE13",
+        "m": "",
+        "bg": "#57343B",
+        "txt": "#EFEAE4",
         "tSize": 20,
         "mSize": 16,
         "btnSize": 16,
         "anim": "glass",
         "yes": "بله، خروج",
         "no": "بمان",
-        "yesBg": "#D7F36A",
+        "yesBg": "#EFEAE4",
         "yesTxt": "#222D29",
         "noBg": "#E5E7EB",
         "noTxt": "#0F172A",
@@ -275,4 +275,4 @@
         "deviceId": "deviceId",
         "failOpen": true
     }
-            }
+}
